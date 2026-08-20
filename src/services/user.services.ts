@@ -216,3 +216,17 @@ const deleteStaffById = async (staffId: number, tenantId: number): Promise<Staff
     await prisma.staff.delete({where: {id: staff.id, tenantId}})
     return staff;
 };
+
+
+export default {
+    createTenant,
+    createStaff,
+    getStaffById,
+    getTenantByEmail,
+    getStaffByEmail,
+    getTenantById,
+    deleteStaffById,
+    deleteTenantById,
+    updateTenantById,
+    updateStaffById
+}

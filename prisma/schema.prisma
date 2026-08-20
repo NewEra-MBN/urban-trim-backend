@@ -20,6 +20,7 @@ model Tenant {
   staff Staff[]
   service Service[]
   booking Booking[]
+  token Token[]
 }
 
 
@@ -53,6 +54,17 @@ model Booking {
   tenant Tenant @relation(fields: [tenantId], references: [id])
 }
 
+model Token {
+  id Int @id @default(autoincrement())
+  token String
+  type TokenType
+  expires DateTime
+  blacklisted Boolean
+  createdAt DateTime @default(now())
+  tenantId Int
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+}
+
 
 enum Role{
   OWNER
@@ -60,5 +72,12 @@ enum Role{
   ASSISTANT
   RECEPTIONIST
   MANAGER
+}
+
+enum TokenType {
+  ACCESS
+  REFRESH
+  RESET_PASSWORD
+  VERIFY_EMAIL
 }
 
