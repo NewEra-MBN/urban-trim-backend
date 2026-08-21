@@ -12,14 +12,6 @@ import { AuthTokensResponse } from '../types/responseType.js';
  *Generate Token
  */
 
-/**
- * Generate token
- * @param {number} userId
- * @param {Moment} expires
- * @param {string} type
- * @param {string} [secret]
- * @returns {string}
- */
 
 const generateToken = (
     tenantId: number,
