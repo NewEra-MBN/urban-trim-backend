@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import moment, {Moment} from 'moment'
-import { HttpStatus } from 'http-status'
+import httpStatus from 'http-status'
 import config from '../config/config.js';
 import userServices from './user.services.js';
 import { ApiError } from '../utils/ApiError.js';
@@ -97,3 +97,44 @@ const generateAuthTokens = async(tenant: {id: number}): Promise<AuthTokensRespon
         }
     }
 }
+
+//reset password tokens
+const generateResetPasswordToken = async(email: string):Promise<string> => {
+    const tenant = await userServices.getTenantByEmail(email)
+
+    if(!tenant){
+        throw new ApiError(httpStatus.NOT_FOUND,'No tenant found with this email')
+    }
+
+    const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, 'minutes')
+
+    const resetToken = generateToken(tenant.id, expires, TokenType.RESET_PASSWORD)
+    
+    await saveToken(resetToken, tenant.id, expires, TokenType.RESET_PASSWORD)
+
+    return resetToken
+}
+
+
+// verify email 
+
+const generateVerifyEmailToken = async(tenant: {id: number}): Promise<string> => {
+    const expires = moment().add(config.jwt.verifyEmailExpirationMinutes, 'minutes')
+    
+    const verifyEmailToken = generateToken(tenant.id, expires, TokenType.VERIFY_EMAIL);
+
+    await saveToken(verifyEmailToken, tenant.id, expires, TokenType.VERIFY_EMAIL)
+
+    return verifyEmailToken
+}
+
+
+
+export default {
+    generateToken, 
+    verifyToken,
+    saveToken, 
+    generateAuthTokens,
+    generateResetPasswordToken,
+    generateVerifyEmailToken
+};
