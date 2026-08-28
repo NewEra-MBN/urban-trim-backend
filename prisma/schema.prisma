@@ -13,7 +13,7 @@ model Tenant {
   name String
   email String @unique
   password String
-  isEmailVerfied Boolean @default(false)
+  isEmailVerified Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

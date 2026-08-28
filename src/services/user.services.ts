@@ -19,8 +19,8 @@ const createTenant = async (
     }
     return prisma.tenant.create({
         data: {
-            email,
             name,
+            email,
             password: await encryptPassword(password),
         }
     });

@@ -16,8 +16,10 @@ import { AuthTokensResponse } from "../types/responseType.js";
 */
 
 const loginTenantWithEmailandPassword = async (email: string, password: string): Promise<Omit<Tenant, 'password'>> => {
+    console.log(password)
     const tenant = await userServices.getTenantByEmail(email)
-    if (!tenant || await (isPasswordMatch(password, tenant.password))) {
+    console.log('here  is the ',tenant)
+    if (!tenant || !await (isPasswordMatch(password, tenant.password))) {
         throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password')
     }
     return exclude(tenant, ['password'])
@@ -30,6 +32,9 @@ const loginTenantWithEmailandPassword = async (email: string, password: string):
 */
 
 const logout = async (refreshToken: string): Promise<void> => {
+    if(!refreshToken) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Refresh Token is Required')
+    }
     const refreshTokenData = await prisma.token.findFirst({
         where: {
             token: refreshToken,
@@ -38,11 +43,15 @@ const logout = async (refreshToken: string): Promise<void> => {
         }
     })
 
+
+    console.log('refresh token data', refreshTokenData)
+
     if (!refreshTokenData) {
         throw new ApiError(httpStatus.NOT_FOUND, 'Not found')
     }
 
-    await prisma.token.delete({ where: { id: refreshTokenData.id } })
+   const tokenData =  await prisma.token.delete({ where: { id: refreshTokenData.id } })
+   console.log(tokenData)
 }
 
 

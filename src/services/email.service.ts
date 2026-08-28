@@ -38,3 +38,8 @@ const sendVerificationEmail = async(to: string, token : string) => {
     `
     await sendMail(to, subject, text);
 }
+
+export default {
+    sendResetPasswordEmail,
+    sendVerificationEmail
+}

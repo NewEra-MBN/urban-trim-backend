@@ -73,7 +73,7 @@ const generateAuthTokens = async(tenant: {id: number}): Promise<AuthTokensRespon
     // refresh token
     const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays,'days')
     const refreshToken = generateToken(tenant.id, refreshTokenExpires, TokenType.REFRESH)
-
+    await saveToken(refreshToken, tenant.id, refreshTokenExpires, TokenType.REFRESH)
     //accessToken 
     const accessTokenExpires = moment().add(config.jwt.accessExpirationMinutes, 'minutes')
     const accessToken = generateToken(tenant.id, accessTokenExpires, TokenType.ACCESS)
