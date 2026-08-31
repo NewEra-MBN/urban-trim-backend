@@ -16,7 +16,7 @@ const jwtVerify: VerifyCallback= async(payload, done) => {
             throw new Error('invalid token type')
         }
 
-        const tenant = await prisma.tenant.findUnique({
+        const user = await prisma.user.findUnique({
             select:{
                 id: true,
                 email: true,
@@ -24,11 +24,11 @@ const jwtVerify: VerifyCallback= async(payload, done) => {
             },
             where: {id : payload.sub}
         })
-        if(!tenant) {
+        if(!user) {
             return done(false, null)
         }
 
-        done(null, tenant)
+        done(null, user)
     }catch(error){
         done(error, false)
     }

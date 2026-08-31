@@ -10,7 +10,7 @@ const verifyCallback = (
   req: any,
   resolve: (value?: unknown) => void,
   reject: (value?: unknown) => void,
-  requiredRights: Permission[]
+  requiredRights: Permissions[]
 ) =>
   async (err: unknown, user: User | false, info: unknown) => {
     if (err || info || !user) {
@@ -23,7 +23,7 @@ const verifyCallback = (
 
     const hasRequiredRights =
       requiredRights.length === 0 ||
-      requiredRights.every((right) => (userPermissions as readonly Permission[]).includes(right));
+      requiredRights.every((right) => (userPermissions as readonly Permissions[]).includes(right));
 
     if (!hasRequiredRights) {
       return reject(new ApiError(httpStatus.FORBIDDEN, "Forbidden"));
