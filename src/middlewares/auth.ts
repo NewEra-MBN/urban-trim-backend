@@ -1,6 +1,6 @@
 import passport from "passport";
 import httpStatus from 'http-status'
-import { Tenant } from "../../generated/prisma/client.js";
+import { User } from "../../generated/prisma/client.js";
 import { ApiError } from "../utils/ApiError.js";
 import { Request, Response, NextFunction } from "express";
 import { Permissions } from "../config/role.js";
