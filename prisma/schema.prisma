@@ -7,71 +7,86 @@ datasource db {
   provider = "postgresql"
 }
 
+model SuperAdmin {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
 model Tenant {
-  id Int @id @default(autoincrement())
-  name String
-  email String @unique
-  password String
-  isEmailVerified Boolean @default(false)
+  id              Int      @id @default(autoincrement())
+  name            String
+  isEmailVerified Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  users    User[]
+  services Service[]
+  bookings Booking[]
+  tokens   Token[]
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  staff Staff[]
-  service Service[]
-  booking Booking[]
-  token Token[]
+  tenantId  Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  bookings  Booking[]
 }
-
-
-model Staff {
-  id Int @id @default(autoincrement())
-  name String
-  email String @unique
-  role String
-  tenantId Int
-  tenant Tenant @relation(fields: [tenantId], references: [id])
-}
-
 
 model Service {
-  id Int @id @default(autoincrement())
-  name String
+  id    Int   @id @default(autoincrement())
+  name  String
   price Int
 
   tenantId Int
-  tenant Tenant @relation(fields: [tenantId], references: [id])
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+  bookings Booking[]
 }
 
-
 model Booking {
-  id Int @id @default(autoincrement())
-  date DateTime
+  id       Int      @id @default(autoincrement())
+  date     DateTime
   customer String
-  status String
+  status   String
 
-  tenantId Int
-  tenant Tenant @relation(fields: [tenantId], references: [id])
+  tenantId  Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+
+  serviceId Int
+  service   Service  @relation(fields: [serviceId], references: [id])
+
+  staffId   Int?
+  staff     User?    @relation(fields: [staffId], references: [id])
 }
 
 model Token {
-  id Int @id @default(autoincrement())
-  token String
-  type TokenType
-  expires DateTime
+  id          Int       @id @default(autoincrement())
+  token       String
+  type        TokenType
+  expires     DateTime
   blacklisted Boolean
-  createdAt DateTime @default(now())
+  createdAt   DateTime  @default(now())
+
   tenantId Int
-  tenant Tenant @relation(fields: [tenantId], references: [id])
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
 }
 
-
-enum Role{
+enum Role {
   OWNER
-  STAFF 
+  MANAGER
   ASSISTANT
   RECEPTIONIST
-  MANAGER
+  STAFF
 }
 
 enum TokenType {
@@ -80,4 +95,3 @@ enum TokenType {
   RESET_PASSWORD
   VERIFY_EMAIL
 }
-
