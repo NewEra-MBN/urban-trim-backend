@@ -19,7 +19,7 @@ const verifyCallback = (
 
     req.user = user;
 
-    const userPermissions = rolePermissions[user.role as Role] ?? [];
+    const userPermissions = rolePermissions[user.role] ?? [];
 
     const hasRequiredRights =
       requiredRights.length === 0 ||

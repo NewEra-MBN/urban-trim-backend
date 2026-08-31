@@ -14,13 +14,13 @@ import { AuthTokensResponse } from '../types/responseType.js';
 
 
 const generateToken = (
-    tenantId: number,
+    userId: number,
     expires: Moment,
     type: TokenType,
     secret = config.jwt.secret
 ): string => {
      const payload = {
-        sub: tenantId,
+        sub: userId,
         iat: moment().unix(),
         exp: expires.unix(),
         type
@@ -32,7 +32,7 @@ const generateToken = (
 // save token 
 const saveToken = async(
     token: string,
-    tenantId: number,
+    userId: number,
     expires: Moment,
     type: TokenType,
     blacklisted = false
@@ -40,7 +40,7 @@ const saveToken = async(
     const createdToken = await prisma.token.create({
         data: {
             token,
-            tenantId: tenantId,
+            tenantId: userId,
             expires: expires.toDate(),
             type,
             blacklisted
@@ -92,17 +92,17 @@ const generateAuthTokens = async(tenant: {id: number}): Promise<AuthTokensRespon
 
 //reset password tokens
 const generateResetPasswordToken = async(email: string):Promise<string> => {
-    const tenant = await userServices.getTenantByEmail(email)
+    const user = await userServices.getUserByEmail(email)
 
-    if(!tenant){
+    if(!user){
         throw new ApiError(httpStatus.NOT_FOUND,'No tenant found with this email')
     }
 
     const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, 'minutes')
 
-    const resetToken = generateToken(tenant.id, expires, TokenType.RESET_PASSWORD)
+    const resetToken = generateToken(user.id, expires, TokenType.RESET_PASSWORD)
     
-    await saveToken(resetToken, tenant.id, expires, TokenType.RESET_PASSWORD)
+    await saveToken(resetToken, user.id, expires, TokenType.RESET_PASSWORD)
 
     return resetToken
 }

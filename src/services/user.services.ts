@@ -1,65 +1,26 @@
-import { Tenant, Staff, Role, Prisma } from "../../generated/prisma/client.js";
-import type { TenantUpdateInput } from "../../generated/prisma/models/Tenant.js";
+import { Tenant, User, Role, Prisma } from "../../generated/prisma/client.js";
 import httpStatus from "http-status";
 import prisma from "../client.js";
 import { ApiError } from "../utils/ApiError.js";
 import { encryptPassword } from "../utils/encryption.js";
-import type { StaffUpdateInput } from "../../generated/prisma/models.js";
 
+// ─────────────────────────────
+// Tenant
+// ─────────────────────────────
 
-//creating the Tenant
-
-const createTenant = async (
-    name: string,
-    email: string,
-    password: string
-): Promise<Tenant> => {
-    if (await getTenantByEmail(email)) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
-    }
+const createTenant = async (name: string): Promise<Tenant> => {
     return prisma.tenant.create({
-        data: {
-            name,
-            email,
-            password: await encryptPassword(password),
-        }
+        data: { name }
     });
 };
 
-
-// create staff 
-
-const createStaff = async (
-    name: string,
-    email: string,
-    role: Role = Role.STAFF,
-    tenantId: number
-): Promise<Staff> => {
-    if (await getStaffByEmail(tenantId, email)) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
-    }
-    return prisma.staff.create({
-        data: {
-            email,
-            name,
-            role,
-            tenantId
-        }
-    });
-};
-
-
-// query for the tenant 
 const getTenantById = async <Key extends keyof Tenant>(
     id: number,
     keys: Key[] = [
-        'id',
-        'email',
-        'name',
-        'password',
-        'isEmailVerified',
-        'createdAt',
-        'updatedAt'
+        "id",
+        "name",
+        "createdAt",
+        "updatedAt"
     ] as Key[]
 ): Promise<Pick<Tenant, Key> | null> => {
     return prisma.tenant.findUnique({
@@ -68,165 +29,138 @@ const getTenantById = async <Key extends keyof Tenant>(
     }) as Promise<Pick<Tenant, Key> | null>;
 };
 
-const getTenantByEmail = async <Key extends keyof Tenant>(
-    email: string,
-    keys: Key[] = [
-        'id',
-        'email',
-        'name',
-        'password',
-        'isEmailVerified',
-        'createdAt',
-        'updatedAt'
-    ] as Key[]
-): Promise<Pick<Tenant, Key> | null> => {
-    return prisma.tenant.findUnique({
-        where: { email },
-        select: keys.reduce((obj, k) => ({ ...obj, [k]: true }), {})
-    }) as Promise<Pick<Tenant, Key> | null>;
-};
-
-
-
-// query for the  staff
-const getStaffById = async <Key extends keyof Staff>(
-    tenantId: number,
-    id: number,
-    keys: Key[] = [
-        'id',
-        'email',
-        'name',
-        'role',
-        'createdAt',
-        'updatedAt'
-    ] as Key[]
-): Promise<Pick<Staff, Key> | null> => {
-    return prisma.staff.findUnique({
-        where: { tenantId, id },
-        select: keys.reduce((obj, k) => ({ ...obj, [k]: true }), {})
-    }) as Promise<Pick<Staff, Key> | null>;
-};
-
-
-
-const getStaffByEmail = async<Key extends keyof Staff>(
-    tenantId: number,
-    email: string,
-    keys: Key[] = [
-        'id',
-        'email',
-        'name',
-        'role',
-        'createdAt',
-        'updatedAt'
-    ] as Key[]
-):Promise<Pick<Staff, Key> | null> => {
-    return prisma.staff.findUnique({
-        where:{tenantId,email},
-        select: keys.reduce((obj, k) =>({...obj, [k] : true}),{})
-    }) as Promise<Pick<Staff, Key> | null>
-}
-
-
-/*
-    update  
-    tenant and staff
-    by Id
-*/
-
-
 const updateTenantById = async <Key extends keyof Tenant>(
     tenantId: number,
-    updateBody: TenantUpdateInput,
-    keys: Key[] = ['id','name','email'] as Key[]
-): Promise<Pick<Tenant, Key> | null> =>{
-    const tenant = await getTenantById(tenantId)
-    if(!tenant) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'tenant not found')
+    updateBody: Prisma.TenantUpdateInput,
+    keys: Key[] = ["id", "name"] as Key[]
+): Promise<Pick<Tenant, Key> | null> => {
+    const tenant = await getTenantById(tenantId);
+    if (!tenant) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Tenant not found");
     }
 
-    if(updateBody.email && (await getTenantByEmail(updateBody.email as string))){
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken')
-    }
-
-    const updateTenant =await prisma.tenant.update({
-        where: {id: tenant.id},
+    return prisma.tenant.update({
+        where: { id: tenant.id },
         data: updateBody,
-        select: keys.reduce((obj, k) => ({...obj, [k] : true}),{})
-    })
-
-    return updateTenant as Promise<Pick<Tenant, Key> | null>
-}
-
-
-// update staff by Id 
-
-
-const updateStaffById = async <Key extends keyof Staff>(
-    tenantId: number,
-    staffId: number,
-    updateBody: StaffUpdateInput,
-    keys: Key[] = ['id','name','email'] as Key[]
-): Promise<Pick<Staff, Key> | null> =>{
-    const staff = await getStaffById(tenantId, staffId)
-    if(!staff) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'Staff not found')
-    }
-
-    if(updateBody.email && (await getStaffByEmail(tenantId, updateBody.email as string))){
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken')
-    }
-
-    const updateStaff =await prisma.staff.update({
-        where: {id: staffId, tenantId},
-        data: updateBody,
-        select: keys.reduce((obj, k) => ({...obj, [k] : true}),{})
-    })
-
-    return updateStaff as Promise<Pick<Staff, Key> | null>
-}
-
-
-
-/// delete tenant && staff ...
+        select: keys.reduce((obj, k) => ({ ...obj, [k]: true }), {})
+    }) as unknown as Promise<Pick<Tenant, Key> | null>;
+};
 
 const deleteTenantById = async (tenantId: number): Promise<Tenant> => {
-    const tenant = await prisma.tenant.findUnique({
-        where: {id: tenantId}
-    })
-
-    if(!tenant){
-        throw new ApiError(httpStatus.NOT_FOUND, 'Tenant not found')
+    const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+    if (!tenant) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Tenant not found");
     }
 
-    await prisma.tenant.delete({where: {id: tenant.id}})
+    await prisma.tenant.delete({ where: { id: tenant.id } });
     return tenant;
 };
 
+// ─────────────────────────────
+// User (Owner / Manager / Assistant / Receptionist / Staff)
+// ─────────────────────────────
 
-const deleteStaffById = async (staffId: number, tenantId: number): Promise<Staff> => {
-    const staff = await prisma.staff.findUnique({
-        where: {id: staffId, tenantId}
-    })
-
-    if(!staff){
-        throw new ApiError(httpStatus.NOT_FOUND, 'Staff not found')
+const createUser = async (
+    name: string,
+    email: string,
+    password: string,
+    role: Role = Role.STAFF,
+    tenantId: number
+): Promise<User> => {
+    if (await getUserByEmail(email)) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
     }
-
-    await prisma.staff.delete({where: {id: staff.id, tenantId}})
-    return staff;
+    return prisma.user.create({
+        data: {
+            name,
+            email,
+            password: await encryptPassword(password),
+            role,
+            tenantId
+        }
+    });
 };
 
+const getUserById = async <Key extends keyof User>(
+    id: number,
+    keys: Key[] = [
+        "id",
+        "email",
+        "name",
+        "role",
+        "tenantId",
+        "isEmailVerified",
+        "createdAt",
+        "updatedAt"
+    ] as Key[]
+): Promise<Pick<User, Key> | null> => {
+    return prisma.user.findUnique({
+        where: { id },
+        select: keys.reduce((obj, k) => ({ ...obj, [k]: true }), {})
+    }) as Promise<Pick<User, Key> | null>;
+};
+
+// email is globally unique on User, so no tenantId needed to look it up
+const getUserByEmail = async <Key extends keyof User>(
+    email: string,
+    keys: Key[] = [
+        "id",
+        "email",
+        "name",
+        "password",
+        "role",
+        "tenantId",
+        "isEmailVerified",
+        "createdAt",
+        "updatedAt"
+    ] as Key[]
+): Promise<Pick<User, Key> | null> => {
+    return prisma.user.findUnique({
+        where: { email },
+        select: keys.reduce((obj, k) => ({ ...obj, [k]: true }), {})
+    }) as Promise<Pick<User, Key> | null>;
+};
+
+const updateUserById = async <Key extends keyof User>(
+    tenantId: number,
+    userId: number,
+    updateBody: Prisma.UserUpdateInput,
+    keys: Key[] = ["id", "name", "email", "role"] as Key[]
+): Promise<Pick<User, Key> | null> => {
+    const user = await getUserById(userId);
+    if (!user || user.tenantId !== tenantId) {
+        throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+    }
+
+    if (updateBody.email && (await getUserByEmail(updateBody.email as string))) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
+    }
+
+    return prisma.user.update({
+        where: { id: userId },
+        data: updateBody,
+        select: keys.reduce((obj, k) => ({ ...obj, [k]: true }), {})
+    }) as unknown as Promise<Pick<User, Key> | null>;
+};
+
+const deleteUserById = async (userId: number, tenantId: number): Promise<User> => {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user || user.tenantId !== tenantId) {
+        throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+    }
+
+    await prisma.user.delete({ where: { id: user.id } });
+    return user;
+};
 
 export default {
     createTenant,
-    createStaff,
-    getStaffById,
-    getTenantByEmail,
-    getStaffByEmail,
     getTenantById,
-    deleteStaffById,
-    deleteTenantById,
     updateTenantById,
-    updateStaffById
-}
+    deleteTenantById,
+    createUser,
+    getUserById,
+    getUserByEmail,
+    updateUserById,
+    deleteUserById
+};

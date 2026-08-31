@@ -17,11 +17,11 @@ model SuperAdmin {
 }
 
 model Tenant {
-  id              Int      @id @default(autoincrement())
-  name            String
-  isEmailVerified Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   users     User[]
   services  Service[]
@@ -43,10 +43,11 @@ model User {
   tenantId Int
   tenant   Tenant    @relation(fields: [tenantId], references: [id])
   bookings Booking[]
+  tokens   Token[]
 }
 
 model Service {
-  id    Int @id @default(autoincrement())
+  id    Int    @id @default(autoincrement())
   name  String
   price Int
 
@@ -61,13 +62,13 @@ model Booking {
   status String
 
   tenantId Int
-  tenant   Tenant  @relation(fields: [tenantId], references: [id])
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
 
   serviceId Int
   service   Service @relation(fields: [serviceId], references: [id])
 
   staffId Int?
-  staff   User?   @relation(fields: [staffId], references: [id])
+  staff   User? @relation(fields: [staffId], references: [id])
 
   customerId Int
   customer   Customer @relation(fields: [customerId], references: [id])
@@ -95,8 +96,11 @@ model Token {
   blacklisted Boolean   @default(false)
   createdAt   DateTime  @default(now())
 
-  tenantId Int
-  tenant   Tenant @relation(fields: [tenantId], references: [id])
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id])
+
+  tenantId Int?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id])
 
   customerId Int?
   customer   Customer? @relation(fields: [customerId], references: [id])
