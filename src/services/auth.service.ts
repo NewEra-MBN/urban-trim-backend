@@ -1,126 +1,151 @@
 import userServices from "./user.services.js";
 import tokenService from "./token.service.js";
-import httpStatus from 'http-status';
+import httpStatus from "http-status";
 import prisma from "../client.js";
 import { encryptPassword, isPasswordMatch } from "../utils/encryption.js";
-import { Tenant, TokenType } from "../../generated/prisma/client.js";
+import { User, TokenType } from "../../generated/prisma/client.js";
 import { ApiError } from "../utils/ApiError.js";
 import exclude from "../utils/exclude.js";
 import { AuthTokensResponse } from "../types/responseType.js";
 
-
 /*
     Login User with
     email and Password
-
 */
 
-const loginTenantWithEmailandPassword = async (email: string, password: string): Promise<Omit<Tenant, 'password'>> => {
-    console.log(password)
-    const tenant = await userServices.getTenantByEmail(email)
-    console.log('here  is the ',tenant)
-    if (!tenant || !await (isPasswordMatch(password, tenant.password))) {
-        throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password')
+const loginUserWithEmailAndPassword = async (
+    email: string,
+    password: string
+): Promise<Omit<User, "password">> => {
+    const user = await userServices.getUserByEmail(email, [
+        "id",
+        "name",
+        "email",
+        "password",
+        "role",
+        "tenantId",
+        "isEmailVerified",
+        "createdAt",
+        "updatedAt"
+    ]);
+
+    if (!user || !(await isPasswordMatch(password, user.password))) {
+        throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect email or password");
     }
-    return exclude(tenant, ['password'])
-}
 
-
+    return exclude(user, ["password"]);
+};
 
 /*
-    Logout 
+    Logout
 */
 
 const logout = async (refreshToken: string): Promise<void> => {
-    if(!refreshToken) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Refresh Token is Required')
+    if (!refreshToken) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "Refresh Token is Required");
     }
+
     const refreshTokenData = await prisma.token.findFirst({
         where: {
             token: refreshToken,
             type: TokenType.REFRESH,
             blacklisted: false
         }
-    })
-
-
-    console.log('refresh token data', refreshTokenData)
+    });
 
     if (!refreshTokenData) {
-        throw new ApiError(httpStatus.NOT_FOUND, 'Not found')
+        throw new ApiError(httpStatus.NOT_FOUND, "Not found");
     }
 
-   const tokenData =  await prisma.token.delete({ where: { id: refreshTokenData.id } })
-   console.log(tokenData)
-}
-
+    await prisma.token.delete({ where: { id: refreshTokenData.id } });
+};
 
 /*
     RefreshAuth
 */
 
-
 const refreshAuth = async (refreshToken: string): Promise<AuthTokensResponse> => {
     try {
         const refreshTokenData = await tokenService.verifyToken(refreshToken, TokenType.REFRESH);
-        const { tenantId } = refreshTokenData;
-        prisma.token.delete({
-            where: { id: refreshTokenData.id }
-        })
-        return tokenService.generateAuthTokens({ id: tenantId })
+        const { userId } = refreshTokenData;
+
+        if (!userId) {
+            throw new Error("Token has no associated user");
+        }
+
+        await prisma.token.delete({ where: { id: refreshTokenData.id } });
+
+        return tokenService.generateAuthTokens({ id: userId });
     } catch {
-        throw new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate')
+        throw new ApiError(httpStatus.UNAUTHORIZED, "Please authenticate");
     }
-}
+};
 
 /*
-    reset password 
-    token 
+    Reset Password
 */
 
 const resetPassword = async (resetPasswordToken: string, newPassword: string): Promise<void> => {
     try {
-        const resetPasswordTokenData = await tokenService.verifyToken(resetPasswordToken, TokenType.RESET_PASSWORD);
-        const tenant = await userServices.getTenantById(resetPasswordTokenData.tenantId);
-        if (!tenant) {
-            throw new Error();
+        const resetPasswordTokenData = await tokenService.verifyToken(
+            resetPasswordToken,
+            TokenType.RESET_PASSWORD
+        );
+
+        if (!resetPasswordTokenData.userId) {
+            throw new Error("Token has no associated user");
         }
+
+        const user = await userServices.getUserById(resetPasswordTokenData.userId);
+        if (!user) {
+            throw new Error("User not found");
+        }
+
         const encryptedPassword = await encryptPassword(newPassword);
-        await userServices.updateTenantById(tenant.id, { password: encryptedPassword })
+        await userServices.updateUserById(user.tenantId, user.id, { password: encryptedPassword });
+
         await prisma.token.deleteMany({
             where: {
-                tenantId: tenant.id,
-                type: TokenType.RESET_PASSWORD,
+                userId: user.id,
+                type: TokenType.RESET_PASSWORD
             }
-        })
+        });
     } catch (error) {
-        throw new ApiError(
-            httpStatus.UNAUTHORIZED,
-            'Password reset failed'
-        )
+        throw new ApiError(httpStatus.UNAUTHORIZED, "Password reset failed");
     }
-}
+};
+
+/*
+    Verify Email
+*/
 
 const verifyEmail = async (verifyEmailToken: string): Promise<void> => {
     try {
         const verifyEmailTokenData = await tokenService.verifyToken(verifyEmailToken, TokenType.VERIFY_EMAIL);
 
+        if (!verifyEmailTokenData.userId) {
+            throw new Error("Token has no associated user");
+        }
+
         await prisma.token.deleteMany({
-            where: { tenantId: verifyEmailTokenData.tenantId, type: TokenType.VERIFY_EMAIL }
-        })
+            where: { userId: verifyEmailTokenData.userId, type: TokenType.VERIFY_EMAIL }
+        });
 
-        await userServices.updateTenantById(verifyEmailTokenData.tenantId, { isEmailVerfied: true })
-    } catch(error){
-        throw new ApiError(httpStatus.UNAUTHORIZED,'Email verificaiton failed')
+        const user = await userServices.getUserById(verifyEmailTokenData.userId);
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        await userServices.updateUserById(user.tenantId, user.id, { isEmailVerified: true });
+    } catch (error) {
+        throw new ApiError(httpStatus.UNAUTHORIZED, "Email verification failed");
     }
-}
-
-
+};
 
 export default {
-    loginTenantWithEmailandPassword, 
-    logout, 
+    loginUserWithEmailAndPassword,
+    logout,
     refreshAuth,
     resetPassword,
     verifyEmail
-}
+};

@@ -19,113 +19,108 @@ const generateToken = (
     type: TokenType,
     secret = config.jwt.secret
 ): string => {
-     const payload = {
+    const payload = {
         sub: userId,
         iat: moment().unix(),
         exp: expires.unix(),
         type
-     }
+    };
 
-     return jwt.sign(payload, secret)
-}
+    return jwt.sign(payload, secret);
+};
 
-// save token 
-const saveToken = async(
+// save token
+const saveToken = async (
     token: string,
     userId: number,
     expires: Moment,
     type: TokenType,
     blacklisted = false
 ): Promise<Token> => {
-    const createdToken = await prisma.token.create({
+    return prisma.token.create({
         data: {
             token,
-            tenantId: userId,
+            userId,
             expires: expires.toDate(),
             type,
             blacklisted
         }
-    })
-    return createdToken
-}
-
-
-
-// verify token 
-const verifyToken =  async(token: string, type: TokenType):Promise<Token> => {
-    const payload = jwt.verify(token, config.jwt.secret);
-    const tenantId = Number(payload.sub)
-    
-    const tokenData = await prisma.token.findFirst({
-        where: {token, type, tenantId, blacklisted: false}
     });
+};
 
-    if(!tokenData) {
-        throw new Error('Token not found')
+// verify token
+const verifyToken = async (token: string, type: TokenType): Promise<Token> => {
+    const payload = jwt.verify(token, config.jwt.secret);
+
+    if (typeof payload === "string" || !payload.sub) {
+        throw new Error("Invalid token payload");
     }
 
-    return tokenData
-}   
+    const userId = Number(payload.sub);
 
-// generate authentication token 
-const generateAuthTokens = async(tenant: {id: number}): Promise<AuthTokensResponse> => {
+    const tokenData = await prisma.token.findFirst({
+        where: { token, type, userId, blacklisted: false }
+    });
 
-    // refresh token
-    const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays,'days')
-    const refreshToken = generateToken(tenant.id, refreshTokenExpires, TokenType.REFRESH)
-    await saveToken(refreshToken, tenant.id, refreshTokenExpires, TokenType.REFRESH)
-    //accessToken 
-    const accessTokenExpires = moment().add(config.jwt.accessExpirationMinutes, 'minutes')
-    const accessToken = generateToken(tenant.id, accessTokenExpires, TokenType.ACCESS)
+    if (!tokenData) {
+        throw new Error("Token not found");
+    }
+
+    return tokenData;
+};
+
+// generate authentication tokens
+const generateAuthTokens = async (user: { id: number }): Promise<AuthTokensResponse> => {
+    const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays, "days");
+    const refreshToken = generateToken(user.id, refreshTokenExpires, TokenType.REFRESH);
+    await saveToken(refreshToken, user.id, refreshTokenExpires, TokenType.REFRESH);
+
+    const accessTokenExpires = moment().add(config.jwt.accessExpirationMinutes, "minutes");
+    const accessToken = generateToken(user.id, accessTokenExpires, TokenType.ACCESS);
 
     return {
-        access:{
+        access: {
             token: accessToken,
             expires: accessTokenExpires.toDate()
         },
-        refresh:{
+        refresh: {
             token: refreshToken,
             expires: refreshTokenExpires.toDate()
         }
+    };
+};
+
+// reset password token
+const generateResetPasswordToken = async (email: string): Promise<string> => {
+    const user = await userServices.getUserByEmail(email);
+
+    if (!user) {
+        throw new ApiError(httpStatus.NOT_FOUND, "No user found with this email");
     }
-}
 
-//reset password tokens
-const generateResetPasswordToken = async(email: string):Promise<string> => {
-    const user = await userServices.getUserByEmail(email)
+    const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, "minutes");
+    const resetToken = generateToken(user.id, expires, TokenType.RESET_PASSWORD);
 
-    if(!user){
-        throw new ApiError(httpStatus.NOT_FOUND,'No tenant found with this email')
-    }
+    await saveToken(resetToken, user.id, expires, TokenType.RESET_PASSWORD);
 
-    const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, 'minutes')
+    return resetToken;
+};
 
-    const resetToken = generateToken(user.id, expires, TokenType.RESET_PASSWORD)
-    
-    await saveToken(resetToken, user.id, expires, TokenType.RESET_PASSWORD)
+// verify email token
+const generateVerifyEmailToken = async (user: { id: number }): Promise<string> => {
+    const expires = moment().add(config.jwt.verifyEmailExpirationMinutes, "minutes");
 
-    return resetToken
-}
+    const verifyEmailToken = generateToken(user.id, expires, TokenType.VERIFY_EMAIL);
 
+    await saveToken(verifyEmailToken, user.id, expires, TokenType.VERIFY_EMAIL);
 
-// verify email 
-
-const generateVerifyEmailToken = async(tenant: {id: number}): Promise<string> => {
-    const expires = moment().add(config.jwt.verifyEmailExpirationMinutes, 'minutes')
-    
-    const verifyEmailToken = generateToken(tenant.id, expires, TokenType.VERIFY_EMAIL);
-
-    await saveToken(verifyEmailToken, tenant.id, expires, TokenType.VERIFY_EMAIL)
-
-    return verifyEmailToken
-}
-
-
+    return verifyEmailToken;
+};
 
 export default {
-    generateToken, 
+    generateToken,
     verifyToken,
-    saveToken, 
+    saveToken,
     generateAuthTokens,
     generateResetPasswordToken,
     generateVerifyEmailToken
