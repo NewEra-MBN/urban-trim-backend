@@ -15,7 +15,7 @@ const createTenant = async (name: string): Promise<Tenant> => {
 };
 
 const getTenantById = async <Key extends keyof Tenant>(
-    id: number,
+    id: string,
     keys: Key[] = [
         "id",
         "name",
@@ -30,7 +30,7 @@ const getTenantById = async <Key extends keyof Tenant>(
 };
 
 const updateTenantById = async <Key extends keyof Tenant>(
-    tenantId: number,
+    tenantId: string,
     updateBody: Prisma.TenantUpdateInput,
     keys: Key[] = ["id", "name"] as Key[]
 ): Promise<Pick<Tenant, Key> | null> => {
@@ -46,7 +46,7 @@ const updateTenantById = async <Key extends keyof Tenant>(
     }) as unknown as Promise<Pick<Tenant, Key> | null>;
 };
 
-const deleteTenantById = async (tenantId: number): Promise<Tenant> => {
+const deleteTenantById = async (tenantId: string): Promise<Tenant> => {
     const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
     if (!tenant) {
         throw new ApiError(httpStatus.NOT_FOUND, "Tenant not found");
@@ -65,7 +65,7 @@ const createUser = async (
     email: string,
     password: string,
     role: Role = Role.STAFF,
-    tenantId: number
+    tenantId: string
 ): Promise<User> => {
     if (await getUserByEmail(email)) {
         throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
@@ -82,7 +82,7 @@ const createUser = async (
 };
 
 const getUserById = async <Key extends keyof User>(
-    id: number,
+    id: string,
     keys: Key[] = [
         "id",
         "email",
@@ -122,8 +122,8 @@ const getUserByEmail = async <Key extends keyof User>(
 };
 
 const updateUserById = async <Key extends keyof User>(
-    tenantId: number,
-    userId: number,
+    tenantId: string,
+    userId: string,
     updateBody: Prisma.UserUpdateInput,
     keys: Key[] = ["id", "name", "email", "role"] as Key[]
 ): Promise<Pick<User, Key> | null> => {
@@ -143,7 +143,7 @@ const updateUserById = async <Key extends keyof User>(
     }) as unknown as Promise<Pick<User, Key> | null>;
 };
 
-const deleteUserById = async (userId: number, tenantId: number): Promise<User> => {
+const deleteUserById = async (userId: string, tenantId: string): Promise<User> => {
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user || user.tenantId !== tenantId) {
         throw new ApiError(httpStatus.NOT_FOUND, "User not found");
