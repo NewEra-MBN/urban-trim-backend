@@ -3,6 +3,7 @@ import httpStatus from "http-status";
 import prisma from "../client.js";
 import { ApiError } from "../utils/ApiError.js";
 import { encryptPassword } from "../utils/encryption.js";
+import { skip } from "@prisma/client/runtime/client";
 
 // ─────────────────────────────
 // Tenant
@@ -28,6 +29,36 @@ const getTenantById = async <Key extends keyof Tenant>(
         select: keys.reduce((obj, k) => ({ ...obj, [k]: true }), {})
     }) as Promise<Pick<Tenant, Key> | null>;
 };
+
+
+
+// query tenant
+const queryTenantsById = async <Key extends keyof Tenant>(
+    filter: object,
+    options: {
+        page:number;
+        limit: number;
+        sortBy: string;
+        sortType: 'asc' | 'desc';
+    },
+    keys:Key[]
+):Promise<Pick<Tenant, Key>[]> =>{
+    const page = options.page ?? 0;
+    const limit = options.limit ?? 10;
+    const sortBy = options.sortBy;
+    const sortType = options.sortType ?? 'asc';
+
+    const tenants = await prisma.tenant.findMany({
+        where: filter,
+        select: keys.reduce((obj,k) => ({...obj, [k] : true}),{}),
+        skip: page * limit,
+        take: limit,
+        orderBy: sortBy ? {[sortBy] : sortType} : undefined
+    })
+    return tenants as Pick<Tenant,Key>[]
+}
+
+
 
 const updateTenantById = async <Key extends keyof Tenant>(
     tenantId: string,
@@ -56,9 +87,13 @@ const deleteTenantById = async (tenantId: string): Promise<Tenant> => {
     return tenant;
 };
 
+
+
 // ─────────────────────────────
 // User (Owner / Manager / Assistant / Receptionist / Staff)
 // ─────────────────────────────
+
+
 
 const createUser = async (
     name: string,
@@ -100,7 +135,43 @@ const getUserById = async <Key extends keyof User>(
     }) as Promise<Pick<User, Key> | null>;
 };
 
-// email is globally unique on User, so no tenantId needed to look it up
+
+// query Users
+const queryUsersById = async <Key extends keyof User>(
+    filter: object,
+    options: {
+        page:number;
+        limit: number;
+        sortBy: string;
+        sortType: 'asc' | 'desc';
+    },
+    keys:Key[] = [
+        "id",
+        "email",
+        "name",
+        "role",
+        "tenantId",
+        "isEmailVerified",
+        "createdAt",
+        "updatedAt"
+    ]as Key[]
+):Promise<Pick<User, Key>[]> =>{
+    const page = options.page ?? 0;
+    const limit = options.limit ?? 10;
+    const sortBy = options.sortBy;
+    const sortType = options.sortType ?? 'asc';
+
+    const users = await prisma.tenant.findMany({
+        where: filter,
+        select: keys.reduce((obj,k) => ({...obj, [k] : true}),{}),
+        skip: page * limit,
+        take: limit,
+        orderBy: sortBy ? {[sortBy] : sortType} : undefined
+    })
+    return users as Pick<User,Key>[]
+}
+
+
 const getUserByEmail = async <Key extends keyof User>(
     email: string,
     keys: Key[] = [
@@ -120,6 +191,8 @@ const getUserByEmail = async <Key extends keyof User>(
         select: keys.reduce((obj, k) => ({ ...obj, [k]: true }), {})
     }) as Promise<Pick<User, Key> | null>;
 };
+
+
 
 const updateUserById = async <Key extends keyof User>(
     tenantId: string,
