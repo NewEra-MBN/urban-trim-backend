@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import moment, { Moment } from 'moment'
 import httpStatus from 'http-status'
 import config from '../config/config.js';
-import userServices from './user.services.js';
+import userServices from './tenant&user.services.js';
 import { ApiError } from '../utils/ApiError.js';
 import { Token, TokenType, OwnerType } from '../../generated/prisma/client.js';
 import prisma from '../client.js';

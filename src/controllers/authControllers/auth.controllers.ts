@@ -1,14 +1,14 @@
 import httpStatus from 'http-status';
-import catchAsync from '../utils/catchAsync.js';
-import authService from '../services/auth.service.js';
-import exclude from '../utils/exclude.js';
-import userServices from '../services/user.services.js';
-import tokenService from '../services/token.service.js';
-import emailService from '../services/email.service.js';
+import catchAsync from '../../utils/catchAsync.js';
+import authService from '../../services/auth.service.js';
+import exclude from '../../utils/exclude.js';
+import userServices from '../../services/tenant&user.services.js';
+import tokenService from '../../services/token.service.js';
+import emailService from '../../services/email.service.js';
 import passport from 'passport';
 import User from '@prisma/client'
-import { ApiError } from '../utils/ApiError.js';
-import { Tenant } from '../../generated/prisma/client.js';
+import { ApiError } from '../../utils/ApiError.js';
+import { Tenant } from '../../../generated/prisma/client.js';
 
 const register = catchAsync(async(req, res) => {
     const {name, email, password} = req.body;

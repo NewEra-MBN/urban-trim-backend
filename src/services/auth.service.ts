@@ -1,4 +1,4 @@
-import userServices from "./user.services.js";
+import userServices from "./tenant&user.services.js";
 import tokenService from "./token.service.js";
 import httpStatus from "http-status";
 import prisma from "../client.js";

@@ -33,13 +33,13 @@ const getTenantById = async <Key extends keyof Tenant>(
 
 
 // query tenant
-const queryTenantsById = async <Key extends keyof Tenant>(
+const queryTenants = async <Key extends keyof Tenant>(
     filter: object,
     options: {
-        page:number;
-        limit: number;
-        sortBy: string;
-        sortType: 'asc' | 'desc';
+        page?:string;
+        limit?: string;
+        sortBy?: string;
+        sortType?: 'asc' | 'desc';
     },
     keys:Key[]
 ):Promise<Pick<Tenant, Key>[]> =>{
@@ -51,11 +51,11 @@ const queryTenantsById = async <Key extends keyof Tenant>(
     const tenants = await prisma.tenant.findMany({
         where: filter,
         select: keys.reduce((obj,k) => ({...obj, [k] : true}),{}),
-        skip: page * limit,
-        take: limit,
+        skip: Number(page) * Number(limit),
+        take: Number(limit),
         orderBy: sortBy ? {[sortBy] : sortType} : undefined
     })
-    return tenants as Pick<Tenant,Key>[]
+    return tenants as Pick<Tenant,Key>[];
 }
 
 
@@ -137,13 +137,13 @@ const getUserById = async <Key extends keyof User>(
 
 
 // query Users
-const queryUsersById = async <Key extends keyof User>(
+const queryUsers = async <Key extends keyof User>(
     filter: object,
     options: {
-        page:number;
-        limit: number;
-        sortBy: string;
-        sortType: 'asc' | 'desc';
+        page?:string;
+        limit?: string;
+        sortBy?: string;
+        sortType?: 'asc' | 'desc';
     },
     keys:Key[] = [
         "id",
@@ -164,11 +164,11 @@ const queryUsersById = async <Key extends keyof User>(
     const users = await prisma.tenant.findMany({
         where: filter,
         select: keys.reduce((obj,k) => ({...obj, [k] : true}),{}),
-        skip: page * limit,
-        take: limit,
+        skip: Number(page) * Number(limit),
+        take: Number(limit),
         orderBy: sortBy ? {[sortBy] : sortType} : undefined
     })
-    return users as Pick<User,Key>[]
+    return users as Pick<User, Key>[]
 }
 
 
@@ -229,10 +229,12 @@ const deleteUserById = async (userId: string, tenantId: string): Promise<User> =
 export default {
     createTenant,
     getTenantById,
+    queryTenants,
     updateTenantById,
     deleteTenantById,
     createUser,
     getUserById,
+    queryUsers,
     getUserByEmail,
     updateUserById,
     deleteUserById
