@@ -3,7 +3,7 @@ import tokenService from "./token.service.js";
 import httpStatus from "http-status";
 import prisma from "../client.js";
 import { encryptPassword, isPasswordMatch } from "../utils/encryption.js";
-import { User, TokenType } from "../../generated/prisma/client.js";
+import { User, TokenType, OwnerType } from "../../generated/prisma/client.js";
 import { ApiError } from "../utils/ApiError.js";
 import exclude from "../utils/exclude.js";
 import { AuthTokensResponse } from "../types/responseType.js";
@@ -67,15 +67,15 @@ const logout = async (refreshToken: string): Promise<void> => {
 const refreshAuth = async (refreshToken: string): Promise<AuthTokensResponse> => {
     try {
         const refreshTokenData = await tokenService.verifyToken(refreshToken, TokenType.REFRESH);
-        const { userId } = refreshTokenData;
+        const { ownerId } = refreshTokenData;
 
-        if (!userId) {
+        if (!ownerId) {
             throw new Error("Token has no associated user");
         }
 
         await prisma.token.delete({ where: { id: refreshTokenData.id } });
 
-        return tokenService.generateAuthTokens({ id: userId });
+        return tokenService.generateAuthTokens(OwnerType.USER, ownerId);
     } catch {
         throw new ApiError(httpStatus.UNAUTHORIZED, "Please authenticate");
     }
@@ -92,17 +92,17 @@ const resetPassword = async (resetPasswordToken: string, newPassword: string): P
             TokenType.RESET_PASSWORD
         );
 
-        if (!resetPasswordTokenData.userId) {
+        if (!resetPasswordTokenData.ownerId) {
             throw new Error("Token has no associated user");
         }
 
-        const user = await userServices.getUserById(resetPasswordTokenData.userId);
+        const user = await userServices.getUserById(resetPasswordTokenData.ownerId);
         if (!user) {
             throw new Error("User not found");
         }
 
         const encryptedPassword = await encryptPassword(newPassword);
-        await userServices.updateUserById(user.tenantId, user.id, { password: encryptedPassword });
+        await userServices.updateUserById(user.tenantId, user.id, {password: encryptedPassword});
 
         await prisma.token.deleteMany({
             where: {
@@ -123,15 +123,15 @@ const verifyEmail = async (verifyEmailToken: string): Promise<void> => {
     try {
         const verifyEmailTokenData = await tokenService.verifyToken(verifyEmailToken, TokenType.VERIFY_EMAIL);
 
-        if (!verifyEmailTokenData.userId) {
+        if (!verifyEmailTokenData.ownerId) {
             throw new Error("Token has no associated user");
         }
 
         await prisma.token.deleteMany({
-            where: { userId: verifyEmailTokenData.userId, type: TokenType.VERIFY_EMAIL }
+            where: { userId: verifyEmailTokenData.ownerId, type: TokenType.VERIFY_EMAIL }
         });
 
-        const user = await userServices.getUserById(verifyEmailTokenData.userId);
+        const user = await userServices.getUserById(verifyEmailTokenData.ownerId);
         if (!user) {
             throw new Error("User not found");
         }

@@ -8,21 +8,22 @@ import emailService from '../../services/email.service.js';
 import passport from 'passport';
 import User from '@prisma/client'
 import { ApiError } from '../../utils/ApiError.js';
-import { Tenant } from '../../../generated/prisma/client.js';
+import { OwnerType, Role, Tenant } from '../../../generated/prisma/client.js';
 
 const register = catchAsync(async(req, res) => {
-    const {name, email, password} = req.body;
-    const tenant = await userServices.createTenant(name, email, password);
-    const safeTenant = exclude(tenant, ['password','createdAt','updatedAt']);
-    const tokens = await tokenService.generateAuthTokens(tenant);
-    res.status(httpStatus.CREATED).send({safeTenant, tokens})
+    const {tenantName, name, email, password} = req.body;
+    const tenant = await userServices.createTenant(tenantName);
+    const user = await userServices.createUser(name, email, password, Role.OWNER, tenant.id)
+     const safeUser = exclude(user, ['password','updatedAt', 'createdAt']);
+    const tokens = await tokenService.generateAuthTokens(OwnerType.USER, user.id);
+    res.status(httpStatus.CREATED).send({safeUser, tokens})
 })
 
 const login = catchAsync(async(req, res) => {
     const {email, password} = req.body;
-    const tenant = await authService.loginTenantWithEmailandPassword(email, password);
-    const token = await tokenService.generateAuthTokens(tenant)
-    res.send({tenant, token})
+    const user = await authService.loginUserWithEmailAndPassword(email, password)
+    const token = await tokenService.generateAuthTokens(OwnerType.USER, user.id)
+    res.send({user, token})
 })
 
 
@@ -31,10 +32,15 @@ const logout = catchAsync(async(req, res) => {
     res.status(httpStatus.NO_CONTENT).send()
 })
 
+const refreshTokens = catchAsync(async(req,res) => {
+    const tokens = await authService.refreshAuth(req.body.refreshToken);
+    res.send({...tokens})
+})
+
 
 const forgotPassword = catchAsync(async(req, res) => {
     const {email} = req.body;
-    const token = await tokenService.generateResetPasswordToken(email);
+    const token = await tokenService.generateResetPasswordToken(OwnerType.USER, email);
     await emailService.sendResetPasswordEmail(email, token)
     res.status(httpStatus.NO_CONTENT).send();
 });
@@ -47,12 +53,12 @@ const resetPassword = catchAsync(async(req, res) => {
 });
 
 const sendVerificationEmail = catchAsync(async(req, res) => {
-    const tenant = req.user;
-    if(!tenant) {
+    const user = req.user;
+    if(!user) {
         throw new ApiError(httpStatus.UNAUTHORIZED, 'please authenticate')
     }
-    const token = await tokenService.generateVerifyEmailToken(tenant);
-    await emailService.sendVerificationEmail(tenant.email, token);
+    const token = await tokenService.generateVerifyEmailToken(OwnerType.USER, user.id);
+    await emailService.sendVerificationEmail(user.email, token);
     res.status(httpStatus.NO_CONTENT).send();
 });
 
@@ -72,5 +78,6 @@ export default {
     forgotPassword,
     resetPassword,
     sendVerificationEmail,
-    verifyEmail
+    verifyEmail,
+    refreshTokens
 }
