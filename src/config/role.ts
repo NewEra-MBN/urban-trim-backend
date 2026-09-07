@@ -1,5 +1,5 @@
 const rolePermissions = {
-  OWNER: ["manage_salon_profile", "manage_branches", "manage_services", "manage_pricing", "manage_promotions","manage_staff","get_staff", "assign_staff_schedule", "assign_staff_services", "view_all_appointments", "manage_appointments", "manage_customers", "view_reports"],
+  OWNER: ["manage_salon_profile","manage_staff", "manage_branches", "manage_services", "manage_pricing", "manage_promotions","manage_staff","get_staff", "assign_staff_schedule", "assign_staff_services", "view_all_appointments", "manage_appointments", "manage_customers", "view_reports"],
 
   MANAGER: ["manage_services", "manage_pricing", "manage_promotions", "edit_staff", "assign_staff_schedule", "assign_staff_services", "view_all_appointments", "manage_appointments", "manage_customers", "view_reports"],
 

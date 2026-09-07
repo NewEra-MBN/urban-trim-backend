@@ -7,9 +7,10 @@ import Joi from "joi";
 
 const validate = (schema : any) => (req: Request, res: Response, next: NextFunction) => {
     const obj = pick(req, Object.keys(schema) as (keyof Request)[]);
-
+    console.log(obj)
     const { value , error } = Joi.compile(schema).prefs({errors: {label: 'key'}, abortEarly: false})
                             .validate(obj);
+    console.log(error)
 
     if(error) {
         const errorMessage = error.details.map(details => details.message).join(', ');

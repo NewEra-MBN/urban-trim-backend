@@ -7,15 +7,34 @@ import { Router } from "express";
 const router = Router();
 
 router
-    .route('/')
-    .post(auth('manage_staff'),validate(userValidation.createUser), userController.createUser)
-    .get(auth('get_staff'),validate(userValidation.getUser), userController.getUsers)
-
+  .route('/')
+  .post(
+    auth('manage_staff'),
+    validate(userValidation.createUser),
+    userController.createUser
+  )
+  .get(
+    auth('get_staff'),
+    validate(userValidation.getUsers),
+    userController.getUsers
+  );
 
 router
-    .route('/:userId')
-    .get(auth('get_staff'), validate(userValidation.getUser), userController.getUser)
-    .patch(auth('manage_staff'), validate(userValidation.updateUser), userController.updateUser)
-    .delete(auth('manage_staff'), validate(userValidation.deleteUser), userController.deleteUser)
+  .route('/:userId')
+  .get(
+    auth('get_staff'),
+    validate(userValidation.getUser),
+    userController.getUser
+  )
+  .patch(
+    auth('manage_staff'),
+    validate(userValidation.updateUser),
+    userController.updateUser
+  )
+  .delete(
+    auth('manage_staff'),
+    validate(userValidation.deleteUser),
+    userController.deleteUser
+  );
 
-    export default router
+export default router;

@@ -13,18 +13,21 @@ const verifyCallback = (
   requiredRights: Permissions[]
 ) =>
   async (err: unknown, user: User | false, info: unknown) => {
+    console.log('here is mr use ', user)
     if (err || info || !user) {
       return reject(new ApiError(httpStatus.UNAUTHORIZED, "Please authenticate"));
     }
 
     req.user = user;
-
+    console.log(user.role)
     const userPermissions = rolePermissions[user.role] ?? [];
+    console.log(userPermissions)
 
     const hasRequiredRights =
       requiredRights.length === 0 ||
       requiredRights.every((right) => (userPermissions as readonly Permissions[]).includes(right));
 
+      console.log(hasRequiredRights)
     if (!hasRequiredRights) {
       return reject(new ApiError(httpStatus.FORBIDDEN, "Forbidden"));
     }

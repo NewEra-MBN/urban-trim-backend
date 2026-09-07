@@ -5,7 +5,12 @@ import pick from "../utils/pick.js";
 import { ApiError } from "../utils/ApiError.js";
 
 const createUser = catchAsync(async (req, res) => {
-    const { email, password, name, role, tenantId } = req.body;
+    const { email, password, name, role } = req.body;
+    const tenantId = req.user?.tenantId;
+    console.log('here is the tenantid',tenantId)
+    if (!tenantId) {
+        throw new ApiError(httpStatus.UNAUTHORIZED, "No tenant associated with this account");
+    }
     const user = await tenantUserServices.createUser(name, email, password, role, tenantId)
     res.status(httpStatus.CREATED).send(user)
 })
@@ -13,23 +18,27 @@ const createUser = catchAsync(async (req, res) => {
 
 const getUsers = catchAsync(async (req, res) => {
     const filter = pick(req.query, ['name', 'role']);
+    const tenantId = req.user?.tenantId as string;
     const options = pick(req.query, ["sortBy", "limit", "page"]) as {
         page?: string;
         limit?: string;
         sortBy?: string;
     };
-    const result = await tenantUserServices.queryUsers(filter, options)
+    const result = await tenantUserServices.queryUsers(filter, options, tenantId)
+    console.log(result);
+    res.send(result)
 })
 
 
 const getUser = catchAsync(async (req, res) => {
+    console.log(req.params)
     const { userId } = req.params;
 
     if (typeof userId !== "string") {
         throw new ApiError(httpStatus.BAD_REQUEST, "Invalid user ID");
     };
 
-    const user = await tenantUserServices.getUserById(userId);
+    const user = await tenantUserServices.getUserById(userId, req.user?.tenantId as string);
     if (!user) {
         throw new ApiError(httpStatus.NOT_FOUND, 'User not found')
     }
@@ -37,7 +46,7 @@ const getUser = catchAsync(async (req, res) => {
 })
 
 const updateUser = catchAsync(async (req, res) => {
-    const tenantId = req.params.tenantId as string;
+    const tenantId = req.user!.tenantId as string;
     const userId = req.params.userId as string;
     const user = await tenantUserServices.updateUserById(tenantId, userId, req.body);
     res.send(user);
@@ -46,9 +55,10 @@ const updateUser = catchAsync(async (req, res) => {
 
 
 const deleteUser = catchAsync(async (req, res) => {
-    const tenantId = req.params.tenantId as string;
+    const tenantId = req.user!.tenantId as string;
     const userId = req.params.userId as string;
-    await tenantUserServices.deleteUserById(tenantId, userId);
+    console.log('hello I am userId',userId)
+    await tenantUserServices.deleteUserById(userId, tenantId);
     res.status(httpStatus.NO_CONTENT).send();
 });
 

@@ -7,7 +7,7 @@ const createUser = {
     email: Joi.string().required().email(),
     password: Joi.string().required().custom(password),
     name: Joi.string().required(),
-    role: Joi.string().required().valid(Role.OWNER)
+    role: Joi.string().required(),
   })
 };
 
@@ -23,13 +23,13 @@ const getUsers = {
 
 const getUser = {
   params: Joi.object().keys({
-    userId: Joi.number().integer()
+    userId: Joi.string().required()
   })
 };
 
 const updateUser = {
   params: Joi.object().keys({
-    userId: Joi.number().integer()
+    userId: Joi.string().required()
   }),
   body: Joi.object()
     .keys({
@@ -42,7 +42,7 @@ const updateUser = {
 
 const deleteUser = {
   params: Joi.object().keys({
-    userId: Joi.number().integer()
+    userId: Joi.string().required()
   })
 };
 

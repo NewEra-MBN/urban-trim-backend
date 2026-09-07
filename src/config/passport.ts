@@ -11,6 +11,7 @@ const jwtOptions = {
 };
 
 const jwtVerify: VerifyCallback= async(payload, done) => {
+    console.log(payload)
     try{
         if(payload.type !== TokenType.ACCESS) {
             throw new Error('invalid token type')
@@ -20,10 +21,13 @@ const jwtVerify: VerifyCallback= async(payload, done) => {
             select:{
                 id: true,
                 email: true,
-                name: true
+                name: true,
+                tenantId:true,
+                role: true,
             },
             where: {id : payload.sub}
         })
+        console.log(user)
         if(!user) {
             return done(false, null)
         }
