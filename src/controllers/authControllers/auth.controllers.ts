@@ -1,6 +1,6 @@
 import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync.js';
-import authService from '../../services/auth.service.js';
+import authService from '../../services/user.auth.service.js';
 import exclude from '../../utils/exclude.js';
 import userServices from '../../services/tenant&user.services.js';
 import tokenService from '../../services/token.service.js';
@@ -12,7 +12,7 @@ import { OwnerType, Role, Tenant } from '../../../generated/prisma/client.js';
 
 const register = catchAsync(async(req, res) => {
     const {tenantName, name, email, password} = req.body;
-    const tenant = await userServices.createTenant(tenantName);
+    const tenant = await userServices.createTenant(tenantName,email);
     const user = await userServices.createUser(name, email, password, Role.OWNER, tenant.id)
      const safeUser = exclude(user, ['password','updatedAt', 'createdAt']);
     const tokens = await tokenService.generateAuthTokens(OwnerType.USER, user.id);

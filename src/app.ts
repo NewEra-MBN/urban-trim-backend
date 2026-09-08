@@ -3,7 +3,7 @@ import cors from 'cors'
 import passport from 'passport'
 import authRoutes from './routes/v1/auth.routes.js'
 import userRoutes from './routes/v1/user.routes.js'
-import { jwtStrategy } from './config/passport.js'
+import { jwtStrategy } from './config/strategies/user.strategy.js'
 import { errorConverter, errorHandler } from './middlewares/error.js'
 
 const app = express();

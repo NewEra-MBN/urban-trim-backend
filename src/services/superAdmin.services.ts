@@ -19,7 +19,6 @@ const getSuperAdminById = async <Key extends keyof SuperAdmin>(
     }) as Promise<Pick<SuperAdmin, Key> | null>;
 };
 
-
 const getSuperAdminByEmail = async <Key extends keyof SuperAdmin>(
     email: string,
     keys: Key[] = [
@@ -34,6 +33,7 @@ const getSuperAdminByEmail = async <Key extends keyof SuperAdmin>(
         select: keys.reduce((obj, k) => ({ ...obj, [k]: true }), {})
     }) as Promise<Pick<SuperAdmin, Key> | null>;
 };
+
 
 const updateSuperAdminById = async <Key extends keyof SuperAdmin>(
     superAdminId: string,
@@ -55,3 +55,9 @@ const updateSuperAdminById = async <Key extends keyof SuperAdmin>(
         select: keys.reduce((obj, k) => ({ ...obj, [k]: true }), {})
     }) as unknown as Promise<Pick<SuperAdmin, Key> | null>;
 };
+
+export default {
+    getSuperAdminByEmail,
+    getSuperAdminById,
+    updateSuperAdminById
+}

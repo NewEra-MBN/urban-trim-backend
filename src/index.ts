@@ -3,7 +3,9 @@ import cors from 'cors'
 import authRoutes from './routes/v1/auth.routes.js'
 import userRoutes from './routes/v1/user.routes.js'
 import passport from 'passport'
-import { jwtStrategy } from './config/passport.js'
+import { userJwtStrategy } from './config/strategies/user.strategy.js'
+import { superAdminJwtStrategy } from './config/strategies/superadmin.strategy.js'
+
 
 const app = express();
 app.use(cors())
@@ -13,7 +15,8 @@ console.log('req hitted')
 
 //jwtauthentication 
 app.use(passport.initialize());
-passport.use('jwt', jwtStrategy)
+passport.use('jwt-user', userJwtStrategy)
+passport.use('jwt-superadmin',superAdminJwtStrategy)
 
 app.use('/api/hello', (req, res) => res.send('hello I am listening'))
 app.use('/api/auth', authRoutes)

@@ -4,10 +4,6 @@ import pick from "../utils/pick.js";
 import tenantUserServices from "../services/tenant&user.services.js";
 import httStatus from 'http-status'
 
-// const getTenants = catchAsync(async(req, res) => {
-//     const filter = pick(req.query, ['name'])
-// })
-
 
 const getTenant = catchAsync(async (req, res) => {
     const { tenantId } = req.params

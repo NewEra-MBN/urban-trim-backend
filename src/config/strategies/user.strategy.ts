@@ -1,8 +1,8 @@
 import { Strategy as JwtStrategy, ExtractJwt, VerifyCallback } from "passport-jwt";
 import httpStatus from 'http-status';
-import config from "./config.js";
-import { TokenType } from "../../generated/prisma/enums.js";
-import prisma from "../client.js";
+import config from "../config.js";
+import { TokenType } from "../../../generated/prisma/enums.js";
+import prisma from "../../client.js";
 
 
 const jwtOptions = {
@@ -38,4 +38,4 @@ const jwtVerify: VerifyCallback= async(payload, done) => {
     }
 }
 
-export const jwtStrategy = new JwtStrategy(jwtOptions, jwtVerify)
+export const userJwtStrategy = new JwtStrategy(jwtOptions, jwtVerify)

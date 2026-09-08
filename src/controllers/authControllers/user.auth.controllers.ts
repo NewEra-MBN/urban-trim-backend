@@ -1,6 +1,6 @@
 import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync.js';
-import authService from '../../services/auth.service.js';
+import authService from '../../services/user.auth.service.js';
 import exclude from '../../utils/exclude.js';
 import userServices from '../../services/tenant&user.services.js';
 import tokenService from '../../services/token.service.js';
