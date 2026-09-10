@@ -1,6 +1,6 @@
 import { ApiError } from "../../utils/ApiError.js";
 import { encryptPassword, isPasswordMatch } from "../../utils/encryption.js";
-import superAdminServices from "../superAdmin.services.js"
+import superAdminServices from "./superAdmin.services.js";
 import httpStatus from 'http-status'
 import tokenService from "../token.service.js";
 import { OwnerType, SuperAdmin, Token, TokenType, User } from "../../../generated/prisma/client.js";
@@ -19,7 +19,7 @@ const loginSuperAdminWithEmailandPassword = async (email: string, password: stri
     if (!superAdmin || !(await isPasswordMatch(superAdmin.password, password))) {
         throw new ApiError(httpStatus.UNAUTHORIZED, "incorrect email or password")
     }
-    return superAdmin
+    return superAdmin as Promise<Omit<SuperAdmin, 'password'>>;
 }
 
 const logout = async (refreshToken: string): Promise<void> => {

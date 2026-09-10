@@ -7,7 +7,7 @@ import { ApiError } from '../utils/ApiError.js';
 import { Token, TokenType, OwnerType } from '../../generated/prisma/client.js';
 import prisma from '../client.js';
 import { AuthTokensResponse } from '../types/responseType.js';
-
+import superAdminServices from './super-admin-services/superAdmin.services.js';
 /**
  *Generate Token
  */
@@ -97,7 +97,7 @@ const generateAuthTokens = async (ownerType: OwnerType, ownerId: string): Promis
 const generateResetPasswordToken = async (ownerType: OwnerType, email: string): Promise<string> => {
     let owner
     if(ownerType === 'SUPERADMIN'){
-        owner = await superAdminService.getSuperAdminByEmail(email)
+        owner = await superAdminServices.getSuperAdminByEmail(email)
     }else if(ownerType === 'USER'){
         owner = await userServices.getUserByEmail(email);
     }
