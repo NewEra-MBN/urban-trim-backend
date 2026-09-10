@@ -21,9 +21,9 @@ const sendMail = async(to: string, subject: string, text: string) => {
 
 const sendResetPasswordEmail = async(to : string, token : string) => {
     const subject = 'Reset Password';
-    const resetPasswordUrl = `http://link-to-app/reset-password?token=${token}`;
+    const resetPasswordUrl = `http://localhost:5000/reset-password?token=${token}`;
     const text = `Dear User
-        To reset your password please click on the link ${resetPasswordUrl}.
+        To reset your password please click on the link ${resetPasswordUrl}
         If you did not request any password reset please ignore the email.
     `;
     await sendMail(to, subject, text)

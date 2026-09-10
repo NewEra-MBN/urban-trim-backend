@@ -14,9 +14,15 @@ import { AuthTokensResponse } from "../../types/responseType.js";
  * @returns 
  */
 const loginSuperAdminWithEmailandPassword = async (email: string, password: string): Promise<Omit<SuperAdmin, 'password'>> => {
-    const superAdmin = await superAdminServices.getSuperAdminByEmail(email);
+    const superAdmin = await superAdminServices.getSuperAdminByEmail(email, [
+        "id",
+        "email",
+        "password",
+        "createdAt",
+        "updatedAt"
+    ]);
 
-    if (!superAdmin || !(await isPasswordMatch(superAdmin.password, password))) {
+    if (!superAdmin || !(await isPasswordMatch(password, superAdmin.password))) {
         throw new ApiError(httpStatus.UNAUTHORIZED, "incorrect email or password")
     }
     return superAdmin as Promise<Omit<SuperAdmin, 'password'>>;
@@ -39,7 +45,7 @@ const logout = async (refreshToken: string): Promise<void> => {
 
 const refreshAuth = async (refreshToken: string): Promise<AuthTokensResponse> => {
     try {
-        const refreshTokenData = await tokenService.verifyToken(refreshToken, TokenType.REFRESH);
+        const refreshTokenData = await tokenService.verifyToken( OwnerType.SUPERADMIN, refreshToken, TokenType.REFRESH);
         const { ownerId } = refreshTokenData;
         await prisma.token.delete({
             where: { id: refreshTokenData.id }
@@ -52,8 +58,8 @@ const refreshAuth = async (refreshToken: string): Promise<AuthTokensResponse> =>
 
 const resetPassword = async (resetPasswordToken: string, newPassword: string): Promise<void> => {
     try{
-        const resetPassTokenData = await tokenService.verifyToken(resetPasswordToken, TokenType.RESET_PASSWORD);
-
+        const resetPassTokenData = await tokenService.verifyToken(OwnerType.SUPERADMIN, resetPasswordToken, TokenType.RESET_PASSWORD);
+        console.log(resetPassTokenData)
         const superAdmin= await superAdminServices.getSuperAdminById(resetPassTokenData.ownerId);
         
         if(!superAdmin) {

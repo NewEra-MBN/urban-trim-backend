@@ -6,7 +6,7 @@ import prisma from "../../client.js";
 
 
 const jwtOptions = {
-    secretOrKey: config.jwt.secret,
+    secretOrKey: config.jwt.userSecret,
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
 };
 

@@ -1,4 +1,4 @@
-import { register } from "node:module";
+
 import { OwnerType } from "../../../generated/prisma/enums.js";
 import emailService from "../../services/email.service.js";
 import superAdminAuthServices from "../../services/super-admin-services/superAdmin.auth.services.js";
@@ -26,7 +26,7 @@ const logout  = catchAsync(async (req, res)=> {
 
 
 const refreshTokens =  catchAsync(async(req, res) => {
-    const refreshToken = req.body.refreshTokens;
+    const refreshToken = req.body.refreshToken;
     if(!refreshToken) throw new ApiError(httpStatus.UNAUTHORIZED, 'RefreshToken Needed')
     const tokens = await superAdminAuthServices.refreshAuth(refreshToken);
     res.send(tokens).send()

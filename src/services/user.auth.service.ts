@@ -68,7 +68,7 @@ const refreshAuth = async (refreshToken: string): Promise<AuthTokensResponse> =>
     try {
         const refreshTokenData = await tokenService.verifyToken(refreshToken, TokenType.REFRESH);
         const { ownerId } = refreshTokenData;
-
+        console.log(ownerId)
         if (!ownerId) {
             throw new Error("Token has no associated user");
         }

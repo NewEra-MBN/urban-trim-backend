@@ -17,7 +17,7 @@ const generateToken = (
     ownerId: string,
     expires: Moment,
     type: TokenType,
-    secret = config.jwt.secret
+    secret = config.jwt.userSecret
 ): string => {
     const payload = {
         sub: ownerId,
@@ -51,8 +51,11 @@ const saveToken = async (
 };
 
 // verify token
-const verifyToken = async (token: string, type: TokenType): Promise<Token> => {
-    const payload = jwt.verify(token, config.jwt.secret);
+const verifyToken = async (ownerType: OwnerType,token: string, type: TokenType): Promise<Token> => {
+    console.log('here is the token',token)
+    const jwtSecret = ownerType === 'SUPERADMIN' ? config.jwt.superAdminSecret : config.jwt.userSecret
+    const payload = jwt.verify(token, jwtSecret);
+    console.log('here is the payload', payload)
 
     if (typeof payload === "string" || !payload.sub) {
         throw new Error("Invalid token payload");
@@ -73,6 +76,7 @@ const verifyToken = async (token: string, type: TokenType): Promise<Token> => {
 
 // generate authentication tokens
 const generateAuthTokens = async (ownerType: OwnerType, ownerId: string): Promise<AuthTokensResponse> => {
+
     const secret = ownerType === "SUPERADMIN" ? config.jwt.superAdminSecret : config.jwt.secret
     const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays, "days");
     const refreshToken = generateToken(ownerId, refreshTokenExpires, TokenType.REFRESH, secret);
@@ -102,12 +106,13 @@ const generateResetPasswordToken = async (ownerType: OwnerType, email: string): 
         owner = await userServices.getUserByEmail(email);
     }
 
+    const jwtSecret = ownerType === 'SUPERADMIN' ? config.jwt.superAdminSecret : config.jwt.userSecret;
     if (!owner) {
         throw new ApiError(httpStatus.NOT_FOUND, "No owner found with this email");
     }
 
     const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, "minutes");
-    const resetToken = generateToken(owner.id, expires, TokenType.RESET_PASSWORD);
+    const resetToken = generateToken(owner.id, expires, TokenType.RESET_PASSWORD, jwtSecret);
 
     await saveToken(resetToken, expires, TokenType.RESET_PASSWORD, ownerType, owner.id);
 

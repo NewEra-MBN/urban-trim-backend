@@ -1,7 +1,7 @@
-import { SuperAdmin } from "../../generated/prisma/client.js";
-import { Prisma } from "../../generated/prisma/client.js";
-import prisma from "../client.js";
-import { ApiError } from "../utils/ApiError.js";
+import { SuperAdmin } from "../../../generated/prisma/client.js";
+import prisma from "../../client.js";
+import { Prisma } from "../../../generated/prisma/client.js";
+import { ApiError } from "../../utils/ApiError.js";
 import httpStatus from 'http-status'
 
 const getSuperAdminById = async <Key extends keyof SuperAdmin>(
