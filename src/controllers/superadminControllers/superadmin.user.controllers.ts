@@ -2,7 +2,6 @@ import tenantUserServices from "../../services/tenant&user.services.js";
 import catchAsync from "../../utils/catchAsync.js";
 import pick from "../../utils/pick.js";
 import exclude from "../../utils/exclude.js";
-import { arrayBuffer } from "node:stream/consumers";
 import httStatus from 'http-status'
 
 const listAllUsersByTenant = catchAsync(async(req,res) => {
@@ -38,7 +37,7 @@ const updateUser = catchAsync(async(req, res) => {
 
 const deleteUser = catchAsync(async(req, res) => {
     const userId = req.params.id as string;
-    const user = await tenantUserServices.deleteAnyUserById(userId)
+    await tenantUserServices.deleteAnyUserById(userId)
     res.send(httStatus.NO_CONTENT).send()
 })
 

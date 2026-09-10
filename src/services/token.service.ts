@@ -73,12 +73,13 @@ const verifyToken = async (token: string, type: TokenType): Promise<Token> => {
 
 // generate authentication tokens
 const generateAuthTokens = async (ownerType: OwnerType, ownerId: string): Promise<AuthTokensResponse> => {
+    const secret = ownerType === "SUPERADMIN" ? config.jwt.superAdminSecret : config.jwt.secret
     const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays, "days");
-    const refreshToken = generateToken(ownerId, refreshTokenExpires, TokenType.REFRESH);
+    const refreshToken = generateToken(ownerId, refreshTokenExpires, TokenType.REFRESH, secret);
     await saveToken(refreshToken, refreshTokenExpires,TokenType.REFRESH,ownerType, ownerId);
 
     const accessTokenExpires = moment().add(config.jwt.accessExpirationMinutes, "minutes");
-    const accessToken = generateToken(ownerId, accessTokenExpires, TokenType.ACCESS);
+    const accessToken = generateToken(ownerId, accessTokenExpires, TokenType.ACCESS, secret);
 
     return {
         access: {
