@@ -66,10 +66,10 @@ const logout = async (refreshToken: string): Promise<void> => {
 
 const refreshAuth = async (refreshToken: string): Promise<AuthTokensResponse> => {
     try {
-        const refreshTokenData = await tokenService.verifyToken(refreshToken, TokenType.REFRESH);
-        const { ownerId } = refreshTokenData;
-        console.log(ownerId)
-        if (!ownerId) {
+        const refreshTokenData = await tokenService.verifyToken(OwnerType.USER, refreshToken, TokenType.REFRESH);
+        const { ownerId, tenantId } = refreshTokenData;
+        
+        if (!ownerId || !tenantId) {
             throw new Error("Token has no associated user");
         }
 
@@ -88,6 +88,7 @@ const refreshAuth = async (refreshToken: string): Promise<AuthTokensResponse> =>
 const resetPassword = async (resetPasswordToken: string, newPassword: string): Promise<void> => {
     try {
         const resetPasswordTokenData = await tokenService.verifyToken(
+            OwnerType.USER,
             resetPasswordToken,
             TokenType.RESET_PASSWORD
         );

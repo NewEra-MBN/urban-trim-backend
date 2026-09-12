@@ -8,25 +8,21 @@ import emailService from '../../services/email.service.js';
 import passport from 'passport';
 import User from '@prisma/client'
 import { ApiError } from '../../utils/ApiError.js';
-import { Role } from '../../../generated/prisma/enums.js';
+import { OwnerType, Role } from '../../../generated/prisma/enums.js';
 
 const register = catchAsync(async(req, res) => {
-    console.log('register hitted')
     const {tenantName, name, email, password} = req.body;
     const tenant = await userServices.createTenant(tenantName);
-    console.log(tenant)
     const user = await userServices.createUser(name, email, password, Role.OWNER, tenant.id)
-    console.log(user)
     const safeUser = exclude(user, ['password','createdAt','updatedAt']);
-    const tokens = await tokenService.generateAuthTokens({kind:'user',userId: user.id});
+    const tokens = await tokenService.generateAuthTokens(OwnerType.USER, user.id);
     res.status(httpStatus.CREATED).send({safeUser, tokens})
 })
 
 const login = catchAsync(async(req, res) => {
     const {email, password} = req.body;
     const user = await authService.loginUserWithEmailAndPassword(email, password);
-    console.log(user)
-    const token = await tokenService.generateAuthTokens(user)
+    const token = await tokenService.generateAuthTokens(OwnerType.USER, user.id)
     res.send({user, token})
 })
 
@@ -45,7 +41,7 @@ const refreshTokens = catchAsync(async(req, res) => {
 
 const forgotPassword = catchAsync(async(req, res) => {
     const {email} = req.body;
-    const token = await tokenService.generateResetPasswordToken(email);
+    const token = await tokenService.generateResetPasswordToken(OwnerType.USER, email);
     await emailService.sendResetPasswordEmail(email, token)
     res.status(httpStatus.NO_CONTENT).send();
 });
@@ -65,7 +61,7 @@ const sendVerificationEmail = catchAsync(async(req, res) => {
     if(!user) {
         throw new ApiError(httpStatus.UNAUTHORIZED, 'please authenticate')
     }
-    const token = await tokenService.generateVerifyEmailToken(user);
+    const token = await tokenService.generateVerifyEmailToken(OwnerType.USER, user.id);
     await emailService.sendVerificationEmail(user.email, token);
     res.status(httpStatus.NO_CONTENT).send();
 });

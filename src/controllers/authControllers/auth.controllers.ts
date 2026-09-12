@@ -57,7 +57,7 @@ const sendVerificationEmail = catchAsync(async(req, res) => {
     if(!user) {
         throw new ApiError(httpStatus.UNAUTHORIZED, 'please authenticate')
     }
-    const token = await tokenService.generateVerifyEmailToken(OwnerType.USER, user.id);
+    const token = await tokenService.generateVerifyEmailToken(OwnerType.USER, user.id, user.tenantId);
     await emailService.sendVerificationEmail(user.email, token);
     res.status(httpStatus.NO_CONTENT).send();
 });

@@ -1,14 +1,12 @@
-function checkPromise(resolve, reject, value) {
-    reject("failed")
+const user = {
+    name:"Kamal",
+    age: 22
 }
 
-function  checkValue(value) {
-    return new Promise((resolve, reject) => {
-        checkPromise(resolve, reject, value)
-    })
-    .then(data => console.log(data))
-    .catch(err => console.log('here is the error',err))
-}
+const tokenData = "shami"
 
 
-checkValue("Hi")
+console.log({
+    ...user,
+    ...(tokenData && { tokenData })
+})

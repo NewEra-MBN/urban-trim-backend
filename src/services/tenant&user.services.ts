@@ -9,7 +9,7 @@ import { skip } from "@prisma/client/runtime/client";
 // Tenant
 // ─────────────────────────────
 
-const createTenant = async (name: string, email: string): Promise<Tenant> => {
+const createTenant = async (name: string, email?: string): Promise<Tenant> => {
     return prisma.tenant.create({
         data: { name, email }
     });

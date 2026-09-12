@@ -1,5 +1,4 @@
 import { Strategy as JwtStrategy, ExtractJwt, VerifyCallback } from "passport-jwt";
-import httpStatus from 'http-status';
 import config from "../config.js";
 import { TokenType } from "../../../generated/prisma/enums.js";
 import prisma from "../../client.js";
