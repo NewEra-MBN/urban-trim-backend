@@ -6,9 +6,9 @@ import superadminUserValidation from "../../../validations/superadmin.user.valid
 const router = Router();
 
 
-// router
-//     .route('/:tenantId')
-//     .get(authSuperAdmin,validate(superadminUserValidation.getAllUserByTenant), superadminUserControllers.listAllUsersByTenant);
+router
+    .route('/tenant/:tenantId')
+    .get(authSuperAdmin,validate(superadminUserValidation.getAllUserByTenant), superadminUserControllers.listAllUsersByTenant);
 
     router
     .route('/:userId')
