@@ -3,7 +3,7 @@ import userAuthRoute from './user.auth.routes.js';
 import userRoute from './user.routes.js';
 import superAdminAuthRoute from './superdmin/superadmin.auth.routes.js';
 import superAdminTenantRoute from './superdmin/superadmin.tenant.routes.js'
-
+import superAdminUserRoute from './superdmin/superadmin.user.routes.js'
 const router = Router();
 
 const defaultRoutes = [
@@ -22,6 +22,10 @@ const defaultRoutes = [
     {
         path:'/superadmin/tenant',
         route: superAdminTenantRoute
+    },
+    {
+        path:'/superadmin/user',
+        route:superAdminUserRoute
     }
 ]
 

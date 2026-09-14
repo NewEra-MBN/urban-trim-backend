@@ -21,6 +21,7 @@ const updateTenant = {
             name: Joi.string(),
             email:Joi.string().email()
         })
+        .min(1)
 }
 
 

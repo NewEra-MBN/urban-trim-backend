@@ -12,8 +12,10 @@ const listAllUsersByTenant = catchAsync(async(req,res) => {
         sortBy?: string;
     };
    const tenantId = req.params.tenantId as string;
+   console.log(tenantId)
    const users = await tenantUserServices.queryUsers(filter, options, tenantId)
-   return users;
+   console.log(users)
+   res.send(users)
 })
 
 
@@ -28,7 +30,7 @@ const getUser  = catchAsync(async(req, res) => {
 
 
 const updateUser = catchAsync(async(req, res) => {
-    const userId = req.params.id as string;
+    const userId = req.params.userId as string;
     const user = await tenantUserServices.updateAnyUserById(userId, req.body)
     res.send(user)
 })
@@ -36,7 +38,7 @@ const updateUser = catchAsync(async(req, res) => {
 
 
 const deleteUser = catchAsync(async(req, res) => {
-    const userId = req.params.id as string;
+    const userId = req.params.userId as string;
     await tenantUserServices.deleteAnyUserById(userId)
     res.send(httStatus.NO_CONTENT).send()
 })

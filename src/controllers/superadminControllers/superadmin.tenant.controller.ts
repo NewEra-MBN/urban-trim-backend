@@ -22,7 +22,8 @@ const listAllTenants = catchAsync(async (req, res) => {
 
 
 const getTenant = catchAsync(async(req, res) => {
-    const id = req.params.id as string;
+    console.log('here is the req.params ', req.params)
+    const id = req.params.tenantId as string;
     const tenant = await tenantUserServices.getTenantById(id)
     res.send(tenant)
 }) 
@@ -37,7 +38,7 @@ const createTenant = catchAsync(async(req, res) => {
 })
 
 const updateTenantById = catchAsync(async(req, res) => {
-    const id = req.params.id as string;
+    const id = req.params.tenantId as string;
     const tenant = await tenantUserServices.updateTenantById(id, req.body)
     res.send(tenant)
 })
@@ -50,7 +51,7 @@ const suspendTenantById = catchAsync(async(req, res) => {
 
 
 const deleteTenant = catchAsync(async(req,res) => {
-    const id = req.params.id as string;
+    const id = req.params.tenantId as string;
     await tenantUserServices.deleteTenantById(id)
     res.status(httStatus.NO_CONTENT).send()
 })

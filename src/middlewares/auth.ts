@@ -45,7 +45,7 @@ const auth =
   async (req: Request, res: Response, next: NextFunction) => {
     return new Promise((resolve, reject) => {
       passport.authenticate(
-        'jwt',
+        'jwt-user',
         { session: false },
         verifyCallback(req, resolve, reject, requiredRights)
       )(req, res, next);

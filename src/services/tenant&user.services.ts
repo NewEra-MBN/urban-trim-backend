@@ -101,7 +101,7 @@ const deleteTenantById = async (tenantId: string): Promise<Tenant> => {
     if (!tenant) {
         throw new ApiError(httpStatus.NOT_FOUND, "Tenant not found");
     }
-
+    console.log('here is the tenant ',tenant)
     await prisma.tenant.delete({ where: { id: tenant.id } });
     return tenant;
 };
