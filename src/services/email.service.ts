@@ -39,7 +39,16 @@ const sendVerificationEmail = async(to: string, token : string) => {
     await sendMail(to, subject, text);
 }
 
+const sendVerficationCode = async(to: string, code: string)  => {
+    const subject = 'Verification Code';
+    const text = `Here is the six digit verification code ${code},
+    Please dont share it with anyone.
+    `
+    await sendMail(to, subject, text)
+}
+
 export default {
     sendResetPasswordEmail,
-    sendVerificationEmail
+    sendVerificationEmail,
+    sendVerficationCode
 }

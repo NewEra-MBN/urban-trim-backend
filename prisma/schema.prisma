@@ -58,7 +58,7 @@ model Service {
 model Booking {
   id     Int      @id @default(autoincrement())
   date   DateTime
-  status String
+  status Status
 
   tenantId String
   tenant   Tenant @relation(fields: [tenantId], references: [id])
@@ -120,4 +120,11 @@ enum OwnerType{
   USER 
   CUSTOMER 
   SUPERADMIN
+}
+
+
+enum Status {
+  PENDING
+  CONFIRMED
+  CANCELLED
 }

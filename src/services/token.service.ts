@@ -81,17 +81,20 @@ const verifyToken = async (ownerType: OwnerType, token: string, type: TokenType)
 // generate authentication tokens
 const generateAuthTokens = async (ownerType: OwnerType, ownerId: string, tenantId?: string): Promise<AuthTokensResponse> => {
 
-    if (ownerType === 'USER' && !tenantId) {
-        throw new Error("Tenant Id is required for User Tokens")
+    if ((ownerType === 'USER' || ownerType === 'CUSTOMER') && !tenantId) {
+        throw new Error(`Tenant Id is required for ${ownerType} Tokens`)
     }
 
     const secret = ownerType === "SUPERADMIN" ? config.jwt.superAdminSecret : config.jwt.userSecret
+
     const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays, "days");
 
     const refreshToken = generateToken(ownerId, refreshTokenExpires, TokenType.REFRESH, secret, tenantId);
+
     await saveToken(refreshToken, refreshTokenExpires, TokenType.REFRESH, ownerType, ownerId);
 
     const accessTokenExpires = moment().add(config.jwt.accessExpirationMinutes, "minutes");
+
     const accessToken = generateToken(ownerId, accessTokenExpires, TokenType.ACCESS, secret, tenantId);
 
     return {
