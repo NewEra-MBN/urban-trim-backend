@@ -42,7 +42,7 @@ export default {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
   jwt: {
-    userSecret: envVars.JWT_SECRET,
+    secret: envVars.JWT_SECRET,
     superAdminSecret: envVars.SUPER_ADMIN_JWT_SECRET,
     accessExpirationMinutes: envVars.JWT_ACCESS_EXPIRATION_MINUTES,
     refreshExpirationDays: envVars.JWT_REFRESH_EXPIRATION_DAYS,

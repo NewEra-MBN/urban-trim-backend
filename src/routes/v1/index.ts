@@ -2,8 +2,9 @@ import { Router } from "express";
 import userAuthRoute from './user.auth.routes.js';
 import userRoute from './user.routes.js';
 import superAdminAuthRoute from './superdmin/superadmin.auth.routes.js';
-import superAdminTenantRoute from './superdmin/superadmin.tenant.routes.js'
-import superAdminUserRoute from './superdmin/superadmin.user.routes.js'
+import superAdminTenantRoute from './superdmin/superadmin.tenant.routes.js';
+import superAdminUserRoute from './superdmin/superadmin.user.routes.js';
+import customerAuthRoute from './customer.routes.js';
 const router = Router();
 
 const defaultRoutes = [
@@ -26,6 +27,10 @@ const defaultRoutes = [
     {
         path:'/superadmin/user',
         route:superAdminUserRoute
+    },
+    {
+        path: '/tenants/:tenantId/customers',
+        route: customerAuthRoute
     }
 ]
 

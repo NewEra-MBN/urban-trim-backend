@@ -1,4 +1,4 @@
-import type { User as PrismaUser, SuperAdmin as PrismaSuperAdmin } from "../../generated/prisma/client.ts";
+import type { User as PrismaUser, SuperAdmin as PrismaSuperAdmin, Customer as PrismaCustomer } from "../../generated/prisma/client.ts";
 
 declare global {
     namespace Express {
@@ -6,6 +6,7 @@ declare global {
         interface User extends PrismaUser, Partial<PrismaSuperAdmin> {}
         interface Request {
             superAdmin?: PrismaSuperAdmin;
+            customer?: PrismaCustomer;
         }
     }
 }

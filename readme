@@ -1,0 +1,4 @@
+****
+In case of Customer Booking .... customer double booking 
+prevented (with pending status) by the run time checking of the booking table.
+...But customer can update there booking...

@@ -3,7 +3,7 @@ const router = Router();
 import authControllers from "../../controllers/authControllers/auth.controllers.js";
 import authValidation from "../../validations/auth.validation.js";
 import validate from "../../middlewares/validate.js";
-import auth from "../../middlewares/auth.js";
+import auth from "../../middlewares/authUser.js";
 
 router.post('/register',validate(authValidation.register), authControllers.register)
 router.post('/login',validate(authValidation.login), authControllers.login)

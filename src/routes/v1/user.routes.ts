@@ -1,4 +1,4 @@
-import auth from "../../middlewares/auth.js";
+import auth from "../../middlewares/authUser.js";
 import validate from "../../middlewares/validate.js";
 import userValidation from "../../validations/user.validation.js";
 import userController from "../../controllers/user.controller.js";

@@ -3,38 +3,37 @@ import config from "../config.js";
 import { TokenType } from "../../../generated/prisma/enums.js";
 import prisma from "../../client.js";
 
-
 const jwtOptions = {
     secretOrKey: config.jwt.secret,
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
-};
+}
 
-const jwtVerify: VerifyCallback= async(payload, done) => {
-    console.log(payload)
+const jwtVerify : VerifyCallback = async (payload, done) => {
     try{
         if(payload.type !== TokenType.ACCESS) {
-            throw new Error('invalid token type')
+            done(null, false)
         }
 
-        const user = await prisma.user.findUnique({
+        const customer = await prisma.customer.findUnique({
+            where: {id: payload.sub},
             select:{
                 id: true,
-                email: true,
                 name: true,
-                tenantId:true,
-                role: true,
-            },
-            where: {id : payload.sub}
+                email: true,
+                phone: true,
+                tenantId: true
+            }
         })
-        console.log(user)
-        if(!user) {
-            return done(false, null)
-        }
 
-        done(null, user)
+        if(!customer) {
+           return done(null, false)
+        } 
+
+        done(null, customer)
     }catch(error){
         done(error, false)
     }
 }
 
-export const userJwtStrategy = new JwtStrategy(jwtOptions, jwtVerify)
+
+export const customerJwtStrategy = new JwtStrategy(jwtOptions, jwtVerify)

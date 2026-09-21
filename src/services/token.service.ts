@@ -17,7 +17,7 @@ const generateToken = (
     ownerId: string,
     expires: Moment,
     type: TokenType,
-    secret = config.jwt.userSecret,
+    secret = config.jwt.secret,
     tenantId?: string,
 ): string => {
     const payload: Record<string, any> = {
