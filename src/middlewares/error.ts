@@ -7,7 +7,7 @@ dotenv.config()
 
 export const errorConverter: ErrorRequestHandler = (err, req, res, next) => {
     let error = err;
-    if(!(Error instanceof ApiError)) {
+    if(!(error instanceof ApiError)) {
         const statusCode = 
             error instanceof PrismaClientKnownRequestError ? httpStatus.BAD_REQUEST 
             : httpStatus.INTERNAL_SERVER_ERROR;
