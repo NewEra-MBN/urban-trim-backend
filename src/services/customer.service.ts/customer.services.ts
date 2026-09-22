@@ -14,6 +14,13 @@ const createBookingRequest = async (
         date: Date;
     }
 ) => {
+    const service = await prisma.service.findFirst({
+        where:{id: body.serviceId, tenantId}
+    })
+
+    if(!service) throw new ApiError(httpStatus.NOT_FOUND, 'Service not found')
+
+
     let customer = await prisma.customer.findUnique({
         where: { tenantId_email: { tenantId, email: body.email } }
     });

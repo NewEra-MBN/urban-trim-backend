@@ -16,7 +16,7 @@ const {
     getSuperAdminById,
     getSuperAdminByEmail,
     updateSuperAdminById
-} = (await import("../services/superAdmin.services.js")).default;
+} = (await import("../services/super-admin-services/superAdmin.services.js")).default;
 
 const superAdmin = {
     id: "admin-1",

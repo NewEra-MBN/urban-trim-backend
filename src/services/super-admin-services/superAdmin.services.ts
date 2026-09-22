@@ -25,6 +25,7 @@ const getSuperAdminByEmail = async <Key extends keyof SuperAdmin>(
         "id",
         "email",
         "createdAt",
+        "password",
         "updatedAt"
     ] as Key[]
 ): Promise<Pick<SuperAdmin, Key> | null> => {

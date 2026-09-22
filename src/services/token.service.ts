@@ -57,7 +57,7 @@ const saveToken = async (
 // verify token
 const verifyToken = async (ownerType: OwnerType, token: string, type: TokenType): Promise<Token & { tenantId?: string }> => {
 
-    const jwtSecret = ownerType === 'SUPERADMIN' ? config.jwt.superAdminSecret : config.jwt.userSecret
+    const jwtSecret = ownerType === 'SUPERADMIN' ? config.jwt.superAdminSecret : config.jwt.secret
     const payload = jwt.verify(token, jwtSecret);
 
     if (typeof payload === "string" || !payload.sub) {
@@ -85,7 +85,7 @@ const generateAuthTokens = async (ownerType: OwnerType, ownerId: string, tenantI
         throw new Error(`Tenant Id is required for ${ownerType} Tokens`)
     }
 
-    const secret = ownerType === "SUPERADMIN" ? config.jwt.superAdminSecret : config.jwt.userSecret
+    const secret = ownerType === "SUPERADMIN" ? config.jwt.superAdminSecret : config.jwt.secret
 
     const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays, "days");
 
@@ -111,7 +111,7 @@ const generateAuthTokens = async (ownerType: OwnerType, ownerId: string, tenantI
 
 // reset password token
 const generateResetPasswordToken = async (ownerType: OwnerType, email: string): Promise<string> => {
-     const jwtSecret = ownerType === 'SUPERADMIN' ? config.jwt.superAdminSecret : config.jwt.userSecret;
+     const jwtSecret = ownerType === 'SUPERADMIN' ? config.jwt.superAdminSecret : config.jwt.secret;
      const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, "minutes");
 
     let resetToken : string;
@@ -142,7 +142,7 @@ const generateVerifyEmailToken = async (ownerType: OwnerType, ownerId: string, t
         throw new Error("user must need a tenant id")
     }
 
-    const jwtSecret = ownerType === 'SUPERADMIN' ? config.jwt.superAdminSecret : config.jwt.userSecret;
+    const jwtSecret = ownerType === 'SUPERADMIN' ? config.jwt.superAdminSecret : config.jwt.secret;
 
     const expires = moment().add(config.jwt.verifyEmailExpirationMinutes, "minutes");
 

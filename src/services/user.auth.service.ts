@@ -87,6 +87,8 @@ const refreshAuth = async (refreshToken: string): Promise<AuthTokensResponse> =>
 
 const resetPassword = async (resetPasswordToken: string, newPassword: string): Promise<void> => {
     try {
+
+        
         const resetPasswordTokenData = await tokenService.verifyToken(
             OwnerType.USER,
             resetPasswordToken,
@@ -97,7 +99,8 @@ const resetPassword = async (resetPasswordToken: string, newPassword: string): P
             throw new Error("Token has no associated user");
         }
 
-        const user = await userServices.getUserById(resetPasswordTokenData.ownerId);
+        const user = await userServices.getUserById(resetPasswordTokenData.ownerId, resetPasswordTokenData.tenantId as unknown as string);
+
         if (!user) {
             throw new Error("User not found");
         }
@@ -122,7 +125,7 @@ const resetPassword = async (resetPasswordToken: string, newPassword: string): P
 
 const verifyEmail = async (verifyEmailToken: string): Promise<void> => {
     try {
-        const verifyEmailTokenData = await tokenService.verifyToken(verifyEmailToken, TokenType.VERIFY_EMAIL);
+        const verifyEmailTokenData = await tokenService.verifyToken(OwnerType.USER, verifyEmailToken, TokenType.VERIFY_EMAIL);
 
         if (!verifyEmailTokenData.ownerId) {
             throw new Error("Token has no associated user");
@@ -132,7 +135,7 @@ const verifyEmail = async (verifyEmailToken: string): Promise<void> => {
             where: { userId: verifyEmailTokenData.ownerId, type: TokenType.VERIFY_EMAIL }
         });
 
-        const user = await userServices.getUserById(verifyEmailTokenData.ownerId);
+        const user = await userServices.getUserById(verifyEmailTokenData.ownerId, verifyEmailTokenData.tenantId as string);
         if (!user) {
             throw new Error("User not found");
         }

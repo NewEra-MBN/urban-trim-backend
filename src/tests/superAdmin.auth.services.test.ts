@@ -36,7 +36,7 @@ vi.mock("../services/token.service.js", () => ({
 }));
 
 const prisma = (await import("../client.js")).default;
-const superAdminServices = (await import("../services/superAdmin.services.js")).default;
+const superAdminServices = (await import("../services/super-admin-services/superAdmin.services.js")).default;
 const tokenService = (await import("../services/token.service.js")).default;
 const { encryptPassword, isPasswordMatch } = await import("../utils/encryption.js");
 const {

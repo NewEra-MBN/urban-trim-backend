@@ -6,6 +6,7 @@ import tokenService from "../token.service.js";
 import { OwnerType, SuperAdmin, Token, TokenType, User } from "../../../generated/prisma/client.js";
 import prisma from "../../client.js";
 import { AuthTokensResponse } from "../../types/responseType.js";
+import exclude from "../../utils/exclude.js";
 
 /**
  * 
@@ -16,6 +17,7 @@ import { AuthTokensResponse } from "../../types/responseType.js";
 const loginSuperAdminWithEmailandPassword = async (email: string, password: string): Promise<Omit<SuperAdmin, 'password'>> => {
     const superAdmin = await superAdminServices.getSuperAdminByEmail(email, [
         "id",
+        "name",
         "email",
         "password",
         "createdAt",
@@ -25,7 +27,10 @@ const loginSuperAdminWithEmailandPassword = async (email: string, password: stri
     if (!superAdmin || !(await isPasswordMatch(password, superAdmin.password))) {
         throw new ApiError(httpStatus.UNAUTHORIZED, "incorrect email or password")
     }
-    return superAdmin as Promise<Omit<SuperAdmin, 'password'>>;
+
+    const safeSuperAdmin = exclude(superAdmin, ['password'])
+
+    return safeSuperAdmin;
 }
 
 const logout = async (refreshToken: string): Promise<void> => {
