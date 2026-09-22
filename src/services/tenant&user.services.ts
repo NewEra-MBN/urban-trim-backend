@@ -101,7 +101,6 @@ const deleteTenantById = async (tenantId: string): Promise<Tenant> => {
     if (!tenant) {
         throw new ApiError(httpStatus.NOT_FOUND, "Tenant not found");
     }
-    console.log('here is the tenant ',tenant)
     await prisma.tenant.delete({ where: { id: tenant.id } });
     return tenant;
 };
@@ -282,7 +281,7 @@ const updateAnyUserById = async <Key extends keyof User>(
 };
 
 const deleteUserById = async (userId: string, tenantId: string): Promise<User> => {
-    console.log('here is the user Id',userId)
+  
     const user = await prisma.user.findUnique(
         {
              where: { id: userId, tenantId } 
@@ -297,7 +296,7 @@ const deleteUserById = async (userId: string, tenantId: string): Promise<User> =
 };
 
 const deleteAnyUserById = async (userId: string): Promise<User> => {
-    console.log('here is the user Id',userId)
+
     const user = await prisma.user.findUnique(
         {
              where: { id: userId } 

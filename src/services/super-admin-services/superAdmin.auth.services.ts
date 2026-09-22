@@ -64,7 +64,6 @@ const refreshAuth = async (refreshToken: string): Promise<AuthTokensResponse> =>
 const resetPassword = async (resetPasswordToken: string, newPassword: string): Promise<void> => {
     try{
         const resetPassTokenData = await tokenService.verifyToken(OwnerType.SUPERADMIN, resetPasswordToken, TokenType.RESET_PASSWORD);
-        console.log(resetPassTokenData)
         const superAdmin= await superAdminServices.getSuperAdminById(resetPassTokenData.ownerId);
         
         if(!superAdmin) {

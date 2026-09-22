@@ -7,7 +7,6 @@ import { ApiError } from "../utils/ApiError.js";
 const createUser = catchAsync(async (req, res) => {
     const { email, password, name, role } = req.body;
     const tenantId = req.user?.tenantId;
-    console.log('here is the tenantid',tenantId)
     if (!tenantId) {
         throw new ApiError(httpStatus.UNAUTHORIZED, "No tenant associated with this account");
     }
@@ -25,13 +24,13 @@ const getUsers = catchAsync(async (req, res) => {
         sortBy?: string;
     };
     const result = await tenantUserServices.queryUsers(filter, options, tenantId)
-    console.log(result);
+
     res.send(result)
 })
 
 
 const getUser = catchAsync(async (req, res) => {
-    console.log(req.params)
+
     const { userId } = req.params;
 
     if (typeof userId !== "string") {
@@ -57,7 +56,6 @@ const updateUser = catchAsync(async (req, res) => {
 const deleteUser = catchAsync(async (req, res) => {
     const tenantId = req.user!.tenantId as string;
     const userId = req.params.userId as string;
-    console.log('hello I am userId',userId)
     await tenantUserServices.deleteUserById(userId, tenantId);
     res.status(httpStatus.NO_CONTENT).send();
 });

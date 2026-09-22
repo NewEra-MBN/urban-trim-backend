@@ -22,7 +22,6 @@ const listAllTenants = catchAsync(async (req, res) => {
 
 
 const getTenant = catchAsync(async(req, res) => {
-    console.log('here is the req.params ', req.params)
     const id = req.params.tenantId as string;
     const tenant = await tenantUserServices.getTenantById(id)
     res.send(tenant)

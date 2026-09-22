@@ -5,8 +5,6 @@ import exclude from '../../utils/exclude.js';
 import userServices from '../../services/tenant&user.services.js';
 import tokenService from '../../services/token.service.js';
 import emailService from '../../services/email.service.js';
-import passport from 'passport';
-import User from '@prisma/client'
 import { ApiError } from '../../utils/ApiError.js';
 import { OwnerType, Role } from '../../../generated/prisma/enums.js';
 
@@ -33,9 +31,7 @@ const logout = catchAsync(async(req, res) => {
 })
 
 const refreshTokens = catchAsync(async(req, res) => {
-    console.log('refresh token hitted')
     const tokens = await authService.refreshAuth(req.body.refreshToken);
-    console.log(tokens)
     res.send({...tokens});
 })
 
@@ -49,9 +45,7 @@ const forgotPassword = catchAsync(async(req, res) => {
 
 const resetPassword = catchAsync(async(req, res) => {
     const token = req.query.token as string;
-    console.log('here is the token',token)
     const {password} = req.body;
-    console.log(password)
     await authService.resetPassword(token, password)
     res.status(httpStatus.NO_CONTENT).send();
 });

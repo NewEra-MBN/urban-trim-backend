@@ -1,7 +1,6 @@
 import tenantUserServices from "../../services/tenant&user.services.js";
 import catchAsync from "../../utils/catchAsync.js";
 import pick from "../../utils/pick.js";
-import exclude from "../../utils/exclude.js";
 import httStatus from 'http-status'
 
 const listAllUsersByTenant = catchAsync(async(req,res) => {
@@ -12,9 +11,7 @@ const listAllUsersByTenant = catchAsync(async(req,res) => {
         sortBy?: string;
     };
    const tenantId = req.params.tenantId as string;
-   console.log(tenantId)
    const users = await tenantUserServices.queryUsers(filter, options, tenantId)
-   console.log(users)
    res.send(users)
 })
 
