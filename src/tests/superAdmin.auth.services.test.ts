@@ -16,7 +16,7 @@ vi.mock("../client.js", () => ({
     }
 }));
 
-vi.mock("../services/superAdmin.services.js", () => ({
+vi.mock("../services/super-admin-services/superAdmin.services.js", () => ({
     default: {
         getSuperAdminByEmail: vi.fn(),
         getSuperAdminById: vi.fn()
@@ -66,8 +66,17 @@ describe("loginSuperAdminWithEmailandPassword", () => {
 
         const result = await loginSuperAdminWithEmailandPassword(superAdmin.email, "plain-password");
 
-        expect(superAdminServices.getSuperAdminByEmail).toHaveBeenCalledWith(superAdmin.email);
-        expect(result).toEqual(superAdmin);
+         expect(superAdminServices.getSuperAdminByEmail).toHaveBeenCalledWith(superAdmin.email, [
+            "id",
+            "name",
+            "email",
+            "password",
+            "createdAt",
+            "updatedAt"
+        ]);
+
+        const { password, ...withoutPassword } = superAdmin;
+        expect(result).toEqual(withoutPassword);
     });
 
     it("throws when superAdmin is not found", async () => {
