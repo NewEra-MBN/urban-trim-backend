@@ -2,6 +2,8 @@ import express from 'express'
 import cors from 'cors'
 import passport from 'passport'
 
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './docs/swagger.js';
 import { userJwtStrategy } from './config/strategies/user.strategy.js';
 import { superAdminJwtStrategy } from './config/strategies/superadmin.strategy.js';
 import { customerJwtStrategy } from './config/strategies/customer.strategy.js';
@@ -20,6 +22,7 @@ passport.use('jwt-superadmin', superAdminJwtStrategy)
 passport.use('jwt-customer', customerJwtStrategy)
 
 app.use('/v1', routes)
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 app.use(errorConverter)
 app.use(errorHandler)

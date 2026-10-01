@@ -24,7 +24,9 @@ const getMe = catchAsync(async (req, res) => {
 
 
 const updateMe = catchAsync(async (req, res) => {
+    console.log(req.customer?.id)
    const result = await customerServices.updateMe(req.customer!.id, req.body)
+  
    res.send(result)
 });
 

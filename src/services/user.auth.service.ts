@@ -75,7 +75,7 @@ const refreshAuth = async (refreshToken: string): Promise<AuthTokensResponse> =>
 
         await prisma.token.delete({ where: { id: refreshTokenData.id } });
 
-        return tokenService.generateAuthTokens(OwnerType.USER, ownerId);
+        return tokenService.generateAuthTokens(OwnerType.USER, ownerId, tenantId);
     } catch {
         throw new ApiError(httpStatus.UNAUTHORIZED, "Please authenticate");
     }
@@ -110,7 +110,7 @@ const resetPassword = async (resetPasswordToken: string, newPassword: string): P
 
         await prisma.token.deleteMany({
             where: {
-                userId: user.id,
+                ownerId: user.id,
                 type: TokenType.RESET_PASSWORD
             }
         });
@@ -132,7 +132,7 @@ const verifyEmail = async (verifyEmailToken: string): Promise<void> => {
         }
 
         await prisma.token.deleteMany({
-            where: { userId: verifyEmailTokenData.ownerId, type: TokenType.VERIFY_EMAIL }
+            where: { ownerId: verifyEmailTokenData.ownerId, type: TokenType.VERIFY_EMAIL }
         });
 
         const user = await userServices.getUserById(verifyEmailTokenData.ownerId, verifyEmailTokenData.tenantId as string);

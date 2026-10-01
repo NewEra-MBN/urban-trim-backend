@@ -3,6 +3,8 @@ import catchAsync from "../utils/catchAsync.js";
 import httpStatus from 'http-status'
 import pick from "../utils/pick.js";
 import { ApiError } from "../utils/ApiError.js";
+import exclude from "../utils/exclude.js";
+import { encryptPassword } from "../utils/encryption.js";
 
 const createUser = catchAsync(async (req, res) => {
     const { email, password, name, role } = req.body;
@@ -10,8 +12,9 @@ const createUser = catchAsync(async (req, res) => {
     if (!tenantId) {
         throw new ApiError(httpStatus.UNAUTHORIZED, "No tenant associated with this account");
     }
-    const user = await tenantUserServices.createUser(name, email, password, role, tenantId)
-    res.status(httpStatus.CREATED).send(user)
+    const user = await tenantUserServices.createUser(name, email, password, role, tenantId);
+    const safeUser = exclude(user, ['password'])
+    res.status(httpStatus.CREATED).send(safeUser)
 })
 
 
@@ -47,7 +50,14 @@ const getUser = catchAsync(async (req, res) => {
 const updateUser = catchAsync(async (req, res) => {
     const tenantId = req.user!.tenantId as string;
     const userId = req.params.userId as string;
-    const user = await tenantUserServices.updateUserById(tenantId, userId, req.body);
+    
+
+    const updateBody = {...req.body};
+    if(updateBody.password) {
+        updateBody.password = await encryptPassword(updateBody.password);
+    }
+
+    const user = await tenantUserServices.updateUserById(tenantId, userId, updateBody);
     res.send(user);
 });
 

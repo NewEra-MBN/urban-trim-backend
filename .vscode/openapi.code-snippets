@@ -1,0 +1,149 @@
+{
+  // Type the prefix (e.g. "oapi") in a .ts file and press Tab.
+  // Press Tab again to jump to the next blank, Shift+Tab to go back.
+
+  "OpenAPI: route with JSON body": {
+    "scope": "typescript",
+    "prefix": "oapi",
+    "description": "OpenAPI comment for a route that receives a JSON body",
+    "body": [
+      "/**",
+      " * @openapi",
+      " * /v1/${1:auth/route}:",
+      " *   ${2|post,put,patch|}:",
+      " *     summary: ${3:What this route does}",
+      " *     tags: [${4:Auth}]",
+      " *     requestBody:",
+      " *       required: true",
+      " *       content:",
+      " *         application/json:",
+      " *           schema:",
+      " *             type: object",
+      " *             required: [${5:field}]",
+      " *             properties:",
+      " *               ${5:field}:",
+      " *                 type: ${6|string,number,integer,boolean,array,object|}",
+      " *                 example: ${7:value}",
+      " *     responses:",
+      " *       ${8:200}:",
+      " *         description: ${9:Success}",
+      " *       ${10:400}:",
+      " *         description: ${11:Validation error}",
+      " */",
+      "$0"
+    ]
+  },
+
+  "OpenAPI: protected route (needs login)": {
+    "scope": "typescript",
+    "prefix": "oapi-auth",
+    "description": "OpenAPI comment for a route behind auth() with a JSON body",
+    "body": [
+      "/**",
+      " * @openapi",
+      " * /v1/${1:auth/route}:",
+      " *   ${2|post,put,patch|}:",
+      " *     summary: ${3:What this route does}",
+      " *     tags: [${4:Auth}]",
+      " *     security:",
+      " *       - bearerAuth: []",
+      " *     requestBody:",
+      " *       required: true",
+      " *       content:",
+      " *         application/json:",
+      " *           schema:",
+      " *             type: object",
+      " *             required: [${5:field}]",
+      " *             properties:",
+      " *               ${5:field}:",
+      " *                 type: ${6|string,number,integer,boolean,array,object|}",
+      " *                 example: ${7:value}",
+      " *     responses:",
+      " *       ${8:200}:",
+      " *         description: ${9:Success}",
+      " *       401:",
+      " *         description: Please authenticate",
+      " */",
+      "$0"
+    ]
+  },
+
+  "OpenAPI: route with no body (e.g. GET)": {
+    "scope": "typescript",
+    "prefix": "oapi-get",
+    "description": "OpenAPI comment for a route with no body, optionally protected",
+    "body": [
+      "/**",
+      " * @openapi",
+      " * /v1/${1:route}:",
+      " *   ${2|get,delete,post|}:",
+      " *     summary: ${3:What this route does}",
+      " *     tags: [${4:Auth}]",
+      " *     security:",
+      " *       - bearerAuth: []",
+      " *     responses:",
+      " *       ${5:200}:",
+      " *         description: ${6:Success}",
+      " *       401:",
+      " *         description: Please authenticate",
+      " */",
+      "$0"
+    ]
+  },
+
+  "OpenAPI: route with :id in the URL": {
+    "scope": "typescript",
+    "prefix": "oapi-id",
+    "description": "OpenAPI comment for a route like /v1/services/:id",
+    "body": [
+      "/**",
+      " * @openapi",
+      " * /v1/${1:services}/{${2:id}}:",
+      " *   ${3|get,delete,patch,put|}:",
+      " *     summary: ${4:What this route does}",
+      " *     tags: [${5:Services}]",
+      " *     security:",
+      " *       - bearerAuth: []",
+      " *     parameters:",
+      " *       - in: path",
+      " *         name: ${2:id}",
+      " *         required: true",
+      " *         schema:",
+      " *           type: string",
+      " *     responses:",
+      " *       ${6:200}:",
+      " *         description: ${7:Success}",
+      " *       404:",
+      " *         description: Not found",
+      " */",
+      "$0"
+    ]
+  },
+
+  "OpenAPI: route with ?query=value": {
+    "scope": "typescript",
+    "prefix": "oapi-query",
+    "description": "OpenAPI comment for a route that reads req.query (e.g. ?token=...)",
+    "body": [
+      "/**",
+      " * @openapi",
+      " * /v1/${1:auth/route}:",
+      " *   ${2|post,get|}:",
+      " *     summary: ${3:What this route does}",
+      " *     tags: [${4:Auth}]",
+      " *     parameters:",
+      " *       - in: query",
+      " *         name: ${5:token}",
+      " *         required: true",
+      " *         schema:",
+      " *           type: string",
+      " *     responses:",
+      " *       ${6:204}:",
+      " *         description: ${7:Success}",
+      " *       ${8:401}:",
+      " *         description: ${9:Invalid or expired token}",
+      " */",
+      "$0"
+    ]
+  }
+}
