@@ -18,7 +18,7 @@ const requestOtp =  async(email: string, customerId: string) => {
 
     await emailService.sendVerficationCode(email, code)
 }
-
+2
 
 const verifyOtp  = async(code: string, tenantId: string, email: string) => {
     const customer = await prisma.customer.findUnique({
