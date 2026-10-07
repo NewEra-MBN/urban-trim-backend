@@ -4,9 +4,10 @@ import authControllers from "../../controllers/authControllers/auth.controllers.
 import authValidation from "../../validations/auth.validation.js";
 import validate from "../../middlewares/validate.js";
 import auth from "../../middlewares/authUser.js";
+import rateLimit from "../../rateLimit.js";
 
 router.post('/register',validate(authValidation.register), authControllers.register)
-router.post('/login',validate(authValidation.login), authControllers.login)
+router.post('/login',rateLimit.loginLimiter, validate(authValidation.login), authControllers.login)
 router.post('/logout', validate(authValidation.logout), authControllers.logout)
 router.post('/refresh-tokens', validate(authValidation.refreshTokens), authControllers.refreshTokens)
 router.post('/forgot-pass', validate(authValidation.forgotPassword), authControllers.forgotPassword)

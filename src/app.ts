@@ -9,10 +9,15 @@ import { superAdminJwtStrategy } from './config/strategies/superadmin.strategy.j
 import { customerJwtStrategy } from './config/strategies/customer.strategy.js';
 import { errorConverter, errorHandler } from './middlewares/error.js';
 import routes from './routes/v1/index.js';
+import helmet from 'helmet';
+import rateLimit from './rateLimit.js';
 
 
 
 const app = express();
+app.use(helmet());
+app.use(rateLimit.globalRateLimiter)
+
 app.use(cors())
 app.use(express.json())
 
