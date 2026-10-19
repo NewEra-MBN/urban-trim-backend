@@ -10,19 +10,26 @@ export const logger = pino({
         version: '1.0.0'
     },
 
+    // hide secrets before any log line is written
+    redact: [
+        'req.headers.authorization',
+        '*.password',
+        '*.code',
+        '*.refreshToken'
+    ],
+
     transport: isProduction
                 ? undefined
                 : {
                     target: 'pino-pretty',
                     options: {
-                        single: false,
                         colorize: true,
                         translateTime: 'SYS:standard',
                         ignore: 'pid,hostname'
                     }
                 },
     
-    level: config.log_level
+    level: config.env === 'test' ? 'silent' : config.log_level
 })
 
 
