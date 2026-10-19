@@ -11,10 +11,19 @@ import { errorConverter, errorHandler } from './middlewares/error.js';
 import routes from './routes/v1/index.js';
 import helmet from 'helmet';
 import rateLimit from './rateLimit.js';
+import { pinoHttp } from 'pino-http';
+import { logger } from './config/logger.js';
 
 
 
 const app = express();
+app.use(pinoHttp({
+    logger,
+    serializers:{
+        req: (req) => ({id: req.id, method: req.method, url: req.url}),
+        res: (res) => ({statusCode: res.statusCode})
+    }
+}));
 app.use(helmet());
 app.use(rateLimit.globalRateLimiter)
 
@@ -28,7 +37,7 @@ passport.use('jwt-customer', customerJwtStrategy)
 
 app.use('/v1', routes)
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
+app.get('/hello', (req, res) => res.send('hello how are you'))
 
 app.use(errorConverter)
 app.use(errorHandler)
