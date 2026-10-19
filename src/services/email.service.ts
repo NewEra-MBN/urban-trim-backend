@@ -8,7 +8,7 @@ if(config.env !== 'test') {
     transport
         .verify()
         .then(() => logger.info('connected to email server'))
-        .catch((err) => logger.warn({err}, 'failed to connect email serverr'))
+        .catch((err) => logger.warn({err}, 'failed to connect email server'))
 }
 
 

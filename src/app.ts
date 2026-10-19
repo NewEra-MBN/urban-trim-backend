@@ -27,7 +27,8 @@ passport.use('jwt-superadmin', superAdminJwtStrategy)
 passport.use('jwt-customer', customerJwtStrategy)
 
 app.use('/v1', routes)
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 
 app.use(errorConverter)
 app.use(errorHandler)

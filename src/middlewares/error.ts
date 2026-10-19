@@ -1,5 +1,6 @@
 import { ErrorRequestHandler } from "express";
-import httpStatus from 'http-status'
+import httpStatus from 'http-status';
+import { logger } from "../config/logger.js";
 import { ApiError } from "../utils/ApiError.js";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import dotenv from 'dotenv'
@@ -22,6 +23,10 @@ export const errorConverter: ErrorRequestHandler = (err, req, res, next) => {
 export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     let {statusCode, message} = err;
     
+    if(statusCode >= 500) {
+        logger.error({err, method: req.method, url: req.originalUrl}, err.message)
+    }
+
     if(process.env.NODE_ENV === 'production' && !err.isOperational) {
         statusCode = httpStatus.INTERNAL_SERVER_ERROR;
         message = httpStatus[httpStatus.INTERNAL_SERVER_ERROR]
