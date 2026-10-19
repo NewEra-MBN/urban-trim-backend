@@ -11,7 +11,7 @@ const router = Router({mergeParams: true});
 
 router.post(
     "/bookings",
-    rateLimit.login_otp_Limiter,
+    rateLimit.otpSendLimiter,
     validate(customerValidation.createBooking),
     customerController.createBooking
 )
@@ -19,6 +19,7 @@ router.post(
 
 router.post(
     "/bookings/:bookingId/confirm",
+    rateLimit.otpVerifyLimiter,
     validate(customerValidation.confirmBooking),
     customerController.confirmBooking
 )

@@ -2,9 +2,10 @@ import { Router } from "express";
 import validate from "../../../middlewares/validate.js";
 import authValidation from "../../../validations/auth.validation.js";
 import superadminAuthController from "../../../controllers/superadminControllers/superadmin.auth.controller.js";
+import rateLimit from "../../../rateLimit.js";
 const router = Router();
 
-router.post('/login', validate(authValidation.login), superadminAuthController.login);
+router.post('/login', rateLimit.loginLimiter, validate(authValidation.login), superadminAuthController.login);
 router.post('/logout', validate(authValidation.logout), superadminAuthController.logout);
 
 router.post(
