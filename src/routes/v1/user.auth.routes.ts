@@ -7,7 +7,7 @@ import auth from "../../middlewares/authUser.js";
 import rateLimit from "../../rateLimit.js";
 
 router.post('/register',validate(authValidation.register), authControllers.register)
-router.post('/login',rateLimit.loginLimiter, validate(authValidation.login), authControllers.login)
+router.post('/login',rateLimit.login_otp_Limiter, validate(authValidation.login), authControllers.login)
 router.post('/logout', validate(authValidation.logout), authControllers.logout)
 router.post('/refresh-tokens', validate(authValidation.refreshTokens), authControllers.refreshTokens)
 router.post('/forgot-pass', validate(authValidation.forgotPassword), authControllers.forgotPassword)

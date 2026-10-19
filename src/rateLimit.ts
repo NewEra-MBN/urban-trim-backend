@@ -7,7 +7,7 @@ const globalRateLimiter =  rateLimit({
 });
 
 
-const loginLimiter = rateLimit({
+const login_otp_Limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 7,
     message: "Too many login Attempts, try again later"
@@ -16,5 +16,5 @@ const loginLimiter = rateLimit({
 
 export default {
     globalRateLimiter,
-    loginLimiter
+    login_otp_Limiter
 }

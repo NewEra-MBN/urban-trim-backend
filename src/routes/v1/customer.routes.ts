@@ -3,6 +3,7 @@ import validate from "../../middlewares/validate.js";
 import customerValidation from "../../validations/customer.validation.js";
 import customerController from "../../controllers/customer.controller.js";
 import customerAuth from "../../middlewares/authCustomer.js";
+import rateLimit from "../../rateLimit.js";
 
 const router = Router({mergeParams: true});
 
@@ -10,6 +11,7 @@ const router = Router({mergeParams: true});
 
 router.post(
     "/bookings",
+    rateLimit.login_otp_Limiter,
     validate(customerValidation.createBooking),
     customerController.createBooking
 )
