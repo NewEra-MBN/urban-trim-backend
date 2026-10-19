@@ -1,14 +1,14 @@
 import nodemailer from 'nodemailer'
 import config from '../config/config.js'
-//import logger 
+import { logger } from '../config/logger.js';
 
 const transport = nodemailer.createTransport(config.email.smtp);
 
 if(config.env !== 'test') {
     transport
         .verify()
-        .then(() => console.log('connected to email server'))
-        .catch(() => console.log('failed to connect email serverr'))
+        .then(() => logger.info('connected to email server'))
+        .catch((err) => logger.warn({err}, 'failed to connect email serverr'))
 }
 
 
