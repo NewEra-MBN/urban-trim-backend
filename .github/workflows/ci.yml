@@ -38,6 +38,9 @@ jobs:
       JWT_SECRET: ci-test-jwt-secret
       SUPER_ADMIN_JWT_SECRET: ci-test-super-admin-secret
 
+      CLOUDINARY_CLOUD_NAME:skjkfjo
+      CLOUDINARY_API_KEY:fksajfodfji
+      CLOUDINARY_API_SECRET:asofwer3icvno
     # WHAT: the to-do list, top to bottom
     steps:
       - name: Checkout code

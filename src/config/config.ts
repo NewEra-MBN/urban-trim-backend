@@ -28,7 +28,10 @@ const envVarsSchema = Joi.object()
     SMTP_PASSWORD: Joi.string().description('password for email server'),
     EMAIL_FROM: Joi.string().description('the from field in the emails sent by the app'),
     LOG_LEVEL: Joi.string().description("pino log level")
-              .default("info")
+              .default("info"),
+    CLOUDINARY_CLOUD_NAME: Joi.string().description("Cloudinary cloud name").required(),
+    CLOUDINARY_API_KEY:Joi.string().description("Cloudinary api key").required(),
+    CLOUDINARY_API_SECRET:Joi.string().description("cloudinary api secret").required()
   })
   .unknown();
 
@@ -62,5 +65,10 @@ export default {
     },
     from: envVars.EMAIL_FROM
   },
-  log_level: envVars.LOG_LEVEL
+  log_level: envVars.LOG_LEVEL,
+  cloudinary: {
+    cloudName: envVars.CLOUDINARY_CLOUD_NAME,
+    apiKey: envVars.CLOUDINARY_API_KEY,
+    apiSecret: envVars.CLOUDINARY_API_SECRET
+  }
 };
