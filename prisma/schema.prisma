@@ -21,6 +21,8 @@ model Tenant {
   name      String
   email     String?  @unique
   suspended Boolean @default(false)
+  logoUrl String?
+  logoPublicId String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -37,6 +39,8 @@ model User {
   password        String
   role            Role
   isEmailVerified Boolean  @default(false)
+  photoUrl String?
+  photoPublicId String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
