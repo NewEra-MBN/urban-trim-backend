@@ -11,6 +11,10 @@ import cloudinaryService from "./cloudinary.service.js";
 // ─────────────────────────────
 
 const createTenant = async (name: string, email?: string): Promise<Tenant> => {
+    const existingTenant = await prisma.tenant.findUnique({ where: { email } });
+    if (existingTenant) {
+        throw new ApiError(httpStatus.CONFLICT, "Tenant with this email already exists");
+    }
     return prisma.tenant.create({
         data: { name, email }
     });
