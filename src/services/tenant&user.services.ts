@@ -4,6 +4,7 @@ import prisma from "../client.js";
 import { ApiError } from "../utils/ApiError.js";
 import { encryptPassword } from "../utils/encryption.js";
 import { skip } from "@prisma/client/runtime/client";
+import cloudinaryService from "./cloudinary.service.js";
 
 // ─────────────────────────────
 // Tenant
@@ -310,6 +311,32 @@ const deleteAnyUserById = async (userId: string): Promise<User> => {
     return user;
 };
 
+
+const updateUserPhoto = async (tenantId: string, userId: string, file: Express.Multer.File) => {
+    const user = await prisma.user.findUnique({
+        where: {
+            id: userId, tenantId
+        }
+    });
+
+    if(!user) {
+        throw new ApiError(httpStatus.NOT_FOUND, "User not found")
+    };
+
+    const {url, publicId} = await cloudinaryService.uploadImage(file, "urbantrim/staff");
+
+    const updateUser = await prisma.user.update({
+        where: {id: user.id},
+        data:{photoUrl: url, photoPublicId: publicId}
+    });
+
+    if(user.photoPublicId) {
+        await cloudinaryService.deleteImage(user.photoPublicId);
+    }
+
+    return updateUser
+}
+
 export default {
     createTenant,
     getTenantById,
@@ -325,5 +352,6 @@ export default {
     updateAnyUserById,
     deleteAnyUserById,
     deleteUserById,
-    suspendTenantById
+    suspendTenantById,
+    updateUserPhoto
 };

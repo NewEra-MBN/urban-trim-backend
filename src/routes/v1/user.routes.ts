@@ -3,6 +3,7 @@ import validate from "../../middlewares/validate.js";
 import userValidation from "../../validations/user.validation.js";
 import userController from "../../controllers/user.controller.js";
 import { Router } from "express";
+import upload from "../../middlewares/upload.js";
 
 const router = Router();
 
@@ -36,6 +37,13 @@ router
     validate(userValidation.deleteUser),
     userController.deleteUser
   );
+
+  router.patch(
+    '/:userId/photo',
+    auth('manage_staff'),
+    upload.single('photo'),
+    userController.uploadPhoto
+  )
 
 export default router;
 

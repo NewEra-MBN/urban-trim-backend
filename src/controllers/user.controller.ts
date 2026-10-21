@@ -71,11 +71,26 @@ const deleteUser = catchAsync(async (req, res) => {
 });
 
 
+const uploadPhoto = catchAsync(async(req, res) => {
+    const tenantId = req.user!.tenantId as string;
+    const userId = req.params.userId as string;
+
+    if(!req.file) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "photo file is required")
+    };
+
+    const user = await tenantUserServices.updateUserPhoto(tenantId, userId, req.file);
+
+    res.send(exclude(user, ['password']))
+})
+
+
 
 export default {
     createUser,
     getUser,
     getUsers,
     updateUser,
-    deleteUser
+    deleteUser,
+    uploadPhoto
 }
