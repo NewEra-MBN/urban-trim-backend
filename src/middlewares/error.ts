@@ -3,6 +3,7 @@ import httpStatus from 'http-status';
 import { logger } from "../config/logger.js";
 import { ApiError } from "../utils/ApiError.js";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
+import multer from "multer";
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -11,6 +12,7 @@ export const errorConverter: ErrorRequestHandler = (err, req, res, next) => {
     if(!(error instanceof ApiError)) {
         const statusCode = 
             error instanceof PrismaClientKnownRequestError ? httpStatus.BAD_REQUEST 
+            : error instanceof multer.MulterError ? httpStatus.BAD_REQUEST
             : httpStatus.INTERNAL_SERVER_ERROR;
         const message = error.message || httpStatus[statusCode];
         error = new ApiError(statusCode, message, false, err.stack)
