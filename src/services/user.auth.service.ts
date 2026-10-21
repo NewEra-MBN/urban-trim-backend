@@ -25,6 +25,8 @@ const loginUserWithEmailAndPassword = async (
         "role",
         "tenantId",
         "isEmailVerified",
+        "photoUrl",
+        "photoPublicId",
         "createdAt",
         "updatedAt"
     ]);
