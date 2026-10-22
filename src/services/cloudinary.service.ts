@@ -13,7 +13,6 @@ cloudinary.config({
 
 const uploadImage = async (file: Express.Multer.File, folder: string) => {
     const dataUri = `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
-    console.log(dataUri)
     try{
         const result = await cloudinary.uploader.upload(dataUri, {
             folder,
@@ -25,7 +24,6 @@ const uploadImage = async (file: Express.Multer.File, folder: string) => {
             publicId: result.public_id
         }
     } catch(err: any) {
-        console.log(err)
         const statusCode = err?.http_code === 400 ? httpStatus.BAD_REQUEST : httpStatus.INTERNAL_SERVER_ERROR;
         throw new ApiError(statusCode, err?.message ?? "Image upload failed")
     }
