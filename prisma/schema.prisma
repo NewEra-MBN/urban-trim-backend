@@ -50,9 +50,10 @@ model User {
 }
 
 model Service {
-  id    Int    @id @default(autoincrement())
-  name  String
-  price Int
+  id              Int    @id @default(autoincrement())
+  name            String
+  price           Int
+  durationMinutes Int
 
   tenantId String
   tenant   Tenant    @relation(fields: [tenantId], references: [id])
@@ -60,9 +61,10 @@ model Service {
 }
 
 model Booking {
-  id     Int      @id @default(autoincrement())
-  date   DateTime
-  status Status
+  id      Int      @id @default(autoincrement())
+  startAt DateTime
+  endAt   DateTime
+  status  Status
 
   tenantId String
   tenant   Tenant @relation(fields: [tenantId], references: [id])
