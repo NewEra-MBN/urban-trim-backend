@@ -1,5 +1,5 @@
 import prisma from "../src/client.js";
-import { Role } from "../generated/prisma/enums.js";
+import { Role, Status } from "../generated/prisma/enums.js";
 import { encryptPassword } from "../src/utils/encryption.js";
 
 const TENANT_COUNT = 5;
@@ -9,7 +9,8 @@ const SERVICE_TEMPLATES = [
     {name: "Cut", price: 3000, durationMinutes: 30},
     {name: "Color", price: 6000, durationMinutes: 60},
     {name: "Perm", price: 8000, durationMinutes: 90}
-]
+];
+const BOOKING_PER_STAFFS = 500;
 
 
 async function seedBooking() {
@@ -77,7 +78,7 @@ async function seedBooking() {
 
     console.log(`Created ${services.length} services`);
 
-
+// every tenant got 50 customers
     const customers = [];
     
     for(const tenant of tenants) {
@@ -94,8 +95,31 @@ async function seedBooking() {
         }
     }
 
-    console.log(`Created ${customers.length} customers`)
+    console.log(`Created ${customers.length} customers`);
+    const bookingData = [];
+    for(const tenant of tenants) {
+        const tenantServices = services.filter(s => s.tenantId === tenant.id);
+        const tenantCustomers = customers.filter(c => c.tenantId  === tenant.id);
+        const tenantStaff = staffList.filter(s => s.tenantId === tenant.id);
 
+         
+        
+        for(const staff of tenantStaff){
+            let cursor = new Date("2026-11-01T09:00:00Z");
+
+            for(let i = 0; i < BOOKING_PER_STAFFS; i++) {
+                const service = tenantServices[i % tenantServices.length];
+                const customer = tenantCustomers[i % tenantCustomers.length]
+                const startAt = cursor;
+                const endAt = new Date(startAt.getTime() + service.durationMinutes * 60 * 1000)
+                cursor = endAt;
+               bookingData.push({ startAt, endAt, status: Status.CONFIRMED, tenantId: tenant.id,
+                   serviceId: service.id, customerId: customer.id, staffId: staff.id });
+            }
+        }
+    }
+    const result = await prisma.booking.createMany({data: bookingData});
+    console.log(`Created ${result.count} bookings`)
 }
 
 
