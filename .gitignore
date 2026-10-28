@@ -6,7 +6,7 @@ dist/
 
 /generated/prisma
 
-scripts/
+scripts/seedSuperAdmin.ts
 
 
 
