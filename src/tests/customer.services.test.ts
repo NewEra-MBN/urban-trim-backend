@@ -29,7 +29,7 @@ const body = {
     phone: "09012345678",
     email: "test@example.com",
     serviceId: 2,                                  // this service belongs to salon B
-    date: new Date("2026-10-01T10:00:00.000Z")
+    startAt: new Date("2026-10-01T10:00:00.000Z")
 };
 
 describe("createBookingRequest — tenant isolation", () => {

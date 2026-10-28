@@ -65,7 +65,7 @@ export default router;
  *         application/json:
  *           schema:
  *             type: object
- *             required: [name, phone, email, serviceId, date]
+ *             required: [name, phone, email, serviceId, startAt]
  *             properties:
  *               name:
  *                 type: string
@@ -80,7 +80,7 @@ export default router;
  *               serviceId:
  *                 type: integer
  *                 example: 1
- *               date:
+ *               startAt:
  *                 type: string
  *                 format: date-time
  *                 example: 2026-10-15T10:00:00.000Z
@@ -264,9 +264,9 @@ export default router;
  *         application/json:
  *           schema:
  *             type: object
- *             required: [date]
+ *             required: [startAt]
  *             properties:
- *               date:
+ *               startAt:
  *                 type: string
  *                 format: date-time
  *                 example: 2026-10-20T14:00:00.000Z

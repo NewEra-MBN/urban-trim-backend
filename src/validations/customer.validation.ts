@@ -9,7 +9,7 @@ const createBooking = {
         phone: Joi.string().pattern(/^\d+$/).required(),
         email: Joi.string().email().required(),
         serviceId: Joi.number().required(),
-        date: Joi.date().iso().required()
+        startAt: Joi.date().iso().required()
     })
 };
 
@@ -61,7 +61,7 @@ const rescheduleBooking = {
         bookingId: Joi.number().required()
     }),
     body: Joi.object().keys({
-        date: Joi.date().iso().required()
+        startAt: Joi.date().iso().required()
     })
 };
 

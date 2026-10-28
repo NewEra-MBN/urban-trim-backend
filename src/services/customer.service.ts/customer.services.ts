@@ -11,14 +11,14 @@ const createBookingRequest = async (
         phone: string;
         email: string;
         serviceId: number;
-        date: Date;
+        startAt: Date;
     }
 ) => {
     const service = await prisma.service.findFirst({
-        where:{id: body.serviceId, tenantId}
+        where: { id: body.serviceId, tenantId }
     })
 
-    if(!service) throw new ApiError(httpStatus.NOT_FOUND, 'Service not found')
+    if (!service) throw new ApiError(httpStatus.NOT_FOUND, 'Service not found')
 
 
     let customer = await prisma.customer.findUnique({
@@ -34,7 +34,7 @@ const createBookingRequest = async (
                 email: body.email
             }
         });
-        
+
     } else if (customer.name !== body.name || customer.phone !== body.phone) {
         await prisma.customer.update({
             where: { id: customer.id },
@@ -49,20 +49,24 @@ const createBookingRequest = async (
         }
     });
 
+    const startAt = body.startAt;
+    const endAt = new Date(startAt.getTime() + service.durationMinutes * 60 * 1000);
+
     if (!booking) {
         booking = await prisma.booking.create({
             data: {
                 tenantId,
                 serviceId: body.serviceId,
                 customerId: customer.id,
-                date: body.date,
+                startAt: startAt,
+                endAt,
                 status: Status.PENDING
             }
         });
     } else {
         booking = await prisma.booking.update({
             where: { id: booking.id },
-            data: { serviceId: body.serviceId, date: body.date }
+            data: { serviceId: body.serviceId, startAt: startAt, endAt}
         });
     }
 
@@ -131,17 +135,21 @@ const cancelBooking = async (bookingId: number, customerId: string) => {
 const rescheduleBooking = async (
     bookingId: number,
     customerId: string,
-    updateBody: { date: Date }
+    updateBody: { startAt: Date }
 ) => {
     const booking = await prisma.booking.findFirst({
-        where: { id: bookingId, customerId }
+        where: { id: bookingId, customerId },
+        include: {service: true}
     });
 
     if (!booking) throw new ApiError(httpStatus.NOT_FOUND, "Booking not found");
 
+    const startAt = updateBody.startAt;
+    const endAt = new Date(startAt.getTime() + booking.service.durationMinutes * 60 * 1000)
+
     return prisma.booking.update({
         where: { id: bookingId },
-        data: updateBody
+        data: {startAt, endAt}
     });
 };
 
