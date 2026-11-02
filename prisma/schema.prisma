@@ -77,6 +77,10 @@ model Booking {
 
   customerId String
   customer   Customer @relation(fields: [customerId], references: [id])
+
+  @@index([tenantId])
+  @@index([tenantId, startAt])
+  @@index([staffId, startAt])
 }
 
 model Customer {
@@ -104,6 +108,8 @@ model Token {
   createdAt   DateTime  @default(now())
   ownerType   OwnerType
   ownerId     String
+
+  @@index([token])
 }
 
 enum Role {
