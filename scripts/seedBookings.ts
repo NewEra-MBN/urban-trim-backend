@@ -49,7 +49,7 @@ async function seedBooking() {
                     email:`${tenant.name}-staff${i}@seed.test`,
                     password,
                     tenantId: tenant.id,
-                    role: Role.STAFF
+                    role: i === 1 ? Role.OWNER : Role.STAFF
                 }
             })
             
