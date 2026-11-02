@@ -5,6 +5,8 @@ import superAdminAuthRoute from './superdmin/superadmin.auth.routes.js';
 import superAdminTenantRoute from './superdmin/superadmin.tenant.routes.js';
 import superAdminUserRoute from './superdmin/superadmin.user.routes.js';
 import customerRoute from './customer.routes.js';
+import bookingRoute from './booking.routes.js';
+
 const router = Router();
 
 const defaultRoutes = [
@@ -31,6 +33,10 @@ const defaultRoutes = [
     {
         path: '/tenants/:tenantId/customers',
         route: customerRoute
+    },
+    {
+        path: '/bookings',
+        route: bookingRoute
     }
 ]
 
